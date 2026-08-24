@@ -66,3 +66,6 @@ ds-bundle/
 
 # ドキュメント（原稿など、ローカル検討用）
 docs/
+
+# Claude Code（実行時のロックファイル。プロセスID等の実行環境固有値のため追跡しない）
+.claude/scheduled_tasks.lock
