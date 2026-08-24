@@ -26,6 +26,17 @@ export const Colors = {
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
+/**
+ * 痛み度合い4段階（軽→重）の配色。単一色相(赤系)×明度/彩度の段階変化による
+ * ordinalスケール（dataviz スキルの validate_palette.js --ordinal で検証済み）。
+ * アイコン形状差（face-meh→face-frown→face-grimace→face-dizzy）と併用し、
+ * 色だけに依存しない識別を担保する。
+ */
+export const PainColors = {
+  light: ['#f87171', '#ef4444', '#b91c1c', '#7f1d1d'],
+  dark: ['#fca5a5', '#f87171', '#dc2626', '#991b1b'],
+} as const;
+
 export const Fonts = Platform.select({
   ios: {
     /** iOS `UIFontDescriptorSystemDesignDefault` */
