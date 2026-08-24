@@ -1,0 +1,21 @@
+# Web版の開発サーバーのみをコンテナ化する。
+#
+# Supabaseのローカル開発環境（Postgres/Auth/Realtime等）は
+# `supabase start`（= Supabase CLI）が内部で専用のdocker composeプロジェクトを
+# 起動・管理するため、ここには含めない。`make db-up` / `make setup` を参照。
+#
+# iOS/Androidのネイティブビルド・実行はAppleの制約等によりホスト側のExpo CLI/EAS Buildで行う。
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - '8081:8081'
+      - '19006:19006'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - path: .env
+        required: false

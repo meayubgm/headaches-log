@@ -1,0 +1,14 @@
+# Expo for Web の開発サーバー用コンテナ
+# iOS/Androidのネイティブビルドはホスト側で行うため対象外（Docker.mdを参照）
+FROM node:22-slim
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+EXPOSE 8081
+
+CMD ["npx", "expo", "start", "--web", "--host", "lan"]

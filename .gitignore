@@ -1,0 +1,68 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# env files（実キーを含むためコミットしない。雛形は .env.example）
+.env
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+example
+
+# generated native folders
+/ios
+/android
+
+# Supabase CLI（ローカル開発環境の生成物）
+supabase/.branches
+supabase/.temp
+
+# Playwright
+test-results
+playwright-report
+blob-report
+playwright/.cache
+.playwright-mcp
+
+# design-sync（claude.ai/design 連携）
+# 生成物・ステージ済みスクリプト・キャッシュは追跡しない。
+# .design-sync/ 配下の入力（config.json / stubs / entry.ts / previews 等）は追跡する。
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules
+.design-sync/compiled-styles.css
+
+# ドキュメント（原稿など、ローカル検討用）
+docs/
