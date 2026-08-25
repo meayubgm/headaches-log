@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ログインなし（ゲスト＝端末単位）でも全機能利用可能、あとからアカウントへ一括紐付け
 - 複数端末競合は Last Write Wins（`updated_at` 比較）で解決
 
-現在の実装状況: Phase 1（クイック記録＋ローカル保存）まで完了。ホーム画面から痛み度合い・頭痛の種類・メモ・発生時刻を記録し、ローカルSQLiteに保存して一覧表示できる。カレンダー・タグ管理・Supabase同期・認証は未実装。
+現在の実装状況: Phase 2（カレンダー表示）まで完了。ホーム画面から痛み度合い・頭痛の種類・メモ・発生時刻を記録し、ローカルSQLiteに保存して一覧表示できる。カレンダー画面では月グリッドに痛み度合いの色ドットと件数を表示し、日付を選ぶとその日の記録一覧が出て、項目から詳細画面（編集・論理削除）へ遷移できる。タグ管理・Supabase同期・認証は未実装。
 
 ## 技術スタック
 
@@ -70,7 +70,7 @@ Makefile に開発コマンドを集約している（`make <target>` で実行�
 
 ### ディレクトリ構成
 
-- `src/app/` — Expo Routerの画面（file-basedルーティング）。`tsconfig.json` で `@/*` → `src/*` にエイリアスされている。Phase 1 時点ではタブを使わず `<Stack>` 1画面構成（Phase 2 でカレンダー画面を追加する際にタブ構成を作る）
+- `src/app/` — Expo Routerの画面（file-basedルーティング）。`tsconfig.json` で `@/*` → `src/*` にエイリアスされている。ルートの `<Stack>` が `(tabs)`（ホーム／カレンダーの2タブ）と `headaches/[id]`（詳細画面。タブの外に置きヘッダー付きでpushする）を持つ。`app.json` の `experiments.typedRoutes` が有効なので、`router.push()` には `{ pathname: '/headaches/[id]', params: { id } }` の形で渡す（テンプレートリテラルは型が通らない）
 - `src/components/` — UIコンポーネント。`splash-gate.tsx` が `bootstrapDb()` の完了を待ってスプラッシュを閉じる（`SplashScreen.hideAsync()` を呼ぶのはここだけ）
 - `src/constants/design-tokens.json` — 色・スペーシングトークンの**唯一の出所**。`src/constants/theme.ts`（JS側）と `tailwind.config.js`（NativeWind）の両方がこれを読む。tailwind.config.js は素のNodeが読むためTSの theme.ts を require できないので JSON にしている
 - `src/lib/db/` — ローカルSQLite関連
@@ -80,6 +80,7 @@ Makefile に開発コマンドを集約している（`make <target>` で実行�
   - `repositories/` — 画面から使うDBアクセス層。生SQLをここに閉じ込め、drizzleのスキーマ型を画面に漏らさない。全関数が `Promise` を返す
   - `bootstrap.ts` — 起動処理（DB初期化→マイグレーション→ローカルuser_id初期化）を Promise ごとキャッシュして**アプリ全体で1回だけ**実行する（`bootstrapDb()`）。Fast Refresh / StrictMode で並行実行されるとマイグレーションが二重に走り `table already exists` で失敗するため
   - `db-revision.ts` — 書き込み通知用のリビジョンカウンタ（`useSyncExternalStore`）。書き込み系リポジトリ関数の末尾で `bumpDbRevision()` を呼び、`useRecentHeadaches` などが再読み込みする
+- `src/lib/calendar.ts` — 月グリッド生成（`buildMonthGrid` / `getGridRange`）と日別集計（`summarizeByDay`）の純粋関数。`occurred_at` はISO8601（UTC）で保存しているため、**日別のグルーピングはSQLiteではなくJS側でローカル日付として行う**（Webのwa-sqliteでは `date(..., 'localtime')` が端末タイムゾーン通りに解決される保証がないため）
 - `supabase/` — Supabase CLIのローカル環境設定と、Postgres側スキーマ・RLSポリシーのマイグレーション（`supabase/migrations/`）
 
 ### オフラインファースト＋同期の設計方針

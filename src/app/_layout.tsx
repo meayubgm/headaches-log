@@ -14,7 +14,10 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <SplashGate>
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="headaches/[id]" options={{ title: '記録の詳細' }} />
+        </Stack>
       </SplashGate>
     </ThemeProvider>
   );

@@ -148,12 +148,37 @@ export async function listRecentHeadaches(
   return rows.map((row) => toRecord(row, typeIdsByHeadache.get(row.id) ?? []));
 }
 
+/**
+ * 半開区間 [fromIso, toIso) に発生した記録を古い順に返す（カレンダーの月表示・日別一覧用）。
+ * 日別のグルーピングは呼び出し側（`lib/calendar.ts`）が JS のローカル日付で行う。
+ */
+export async function listHeadachesBetween(
+  fromIso: string,
+  toIso: string,
+): Promise<HeadacheRecord[]> {
+  const rows = await getDb().getAllAsync<HeadacheRow>(
+    `SELECT id, occurred_at, pain_level, memo, created_at, updated_at
+       FROM headaches
+      WHERE user_id = ? AND deleted_at IS NULL
+        AND occurred_at >= ? AND occurred_at < ?
+      ORDER BY occurred_at ASC, created_at ASC`,
+    getLocalUserId(),
+    fromIso,
+    toIso,
+  );
+
+  const typeIdsByHeadache = await loadTypeIdsByHeadache(rows.map((row) => row.id));
+
+  return rows.map((row) => toRecord(row, typeIdsByHeadache.get(row.id) ?? []));
+}
+
 export async function getHeadache(id: string): Promise<HeadacheRecord | null> {
   const row = await getDb().getFirstAsync<HeadacheRow>(
     `SELECT id, occurred_at, pain_level, memo, created_at, updated_at
        FROM headaches
-      WHERE id = ? AND deleted_at IS NULL`,
+      WHERE id = ? AND user_id = ? AND deleted_at IS NULL`,
     id,
+    getLocalUserId(),
   );
 
   if (!row) {
@@ -189,12 +214,21 @@ export async function updateHeadache(
   }
 
   await db.withTransactionAsync(async () => {
-    await db.runAsync(
-      `UPDATE headaches SET ${[...assignments, 'updated_at = ?', '_dirty = 1'].join(', ')} WHERE id = ?`,
+    const result = await db.runAsync(
+      `UPDATE headaches SET ${[...assignments, 'updated_at = ?', '_dirty = 1'].join(', ')}
+        WHERE id = ? AND user_id = ?`,
       ...params,
       now,
       id,
+      getLocalUserId(),
     );
+
+    // 他ユーザーの行や存在しないIDを黙って成功扱いにしない。
+    // ここで throw すると withTransactionAsync がロールバックするので、
+    // 中間テーブルだけが書き換わることもない。
+    if (result.changes === 0) {
+      throw new Error(`更新対象の記録が見つかりません: ${id}`);
+    }
 
     if (input.typeIds !== undefined) {
       await replaceTypeLinks(id, input.typeIds);
@@ -215,12 +249,18 @@ export async function updateHeadache(
 export async function softDeleteHeadache(id: string): Promise<void> {
   const now = new Date().toISOString();
 
-  await getDb().runAsync(
-    'UPDATE headaches SET deleted_at = ?, updated_at = ?, _dirty = 1 WHERE id = ?',
+  const result = await getDb().runAsync(
+    `UPDATE headaches SET deleted_at = ?, updated_at = ?, _dirty = 1
+      WHERE id = ? AND user_id = ?`,
     now,
     now,
     id,
+    getLocalUserId(),
   );
+
+  if (result.changes === 0) {
+    throw new Error(`削除対象の記録が見つかりません: ${id}`);
+  }
 
   bumpDbRevision();
 }

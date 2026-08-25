@@ -3,8 +3,8 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { HeadacheDetailForm } from '@/components/headache-detail-form';
+import { HeadacheList } from '@/components/headache-list';
 import { PainLevelSelector } from '@/components/pain-level-selector';
-import { RecentHeadacheList } from '@/components/recent-headache-list';
 import { ToastBanner } from '@/components/toast-banner';
 import type { PainLevel } from '@/constants/pain-levels';
 import { useHeadacheTypes } from '@/hooks/use-headache-types';
@@ -12,10 +12,7 @@ import { useRecentHeadaches } from '@/hooks/use-recent-headaches';
 import { createHeadache } from '@/lib/db/repositories/headaches';
 import type { HeadacheTypeId } from '@/lib/db/repositories/types';
 import { formatFullDate } from '@/lib/format-date';
-
-function formatError(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
+import { formatError } from '@/lib/format-error';
 
 export default function HomeScreen() {
   const typesState = useHeadacheTypes();
@@ -157,7 +154,7 @@ export default function HomeScreen() {
                 {`記録の読み込みに失敗しました: ${formatError(recentState.error)}`}
               </Text>
             ) : (
-              <RecentHeadacheList records={records} types={types} />
+              <HeadacheList records={records} types={types} />
             )}
           </View>
         </ScrollView>
