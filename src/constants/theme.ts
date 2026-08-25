@@ -1,30 +1,19 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * アプリ全体のデザイントークン。
+ *
+ * 色・スペーシングの実体は `design-tokens.json` に置き、このファイルと
+ * `tailwind.config.js`（NativeWind）の両方がそれを読むことで二重管理を避ける。
+ * tailwind.config.js は素の Node が読むため TypeScript の theme.ts を require できず、
+ * JSON を共通の出所にしている。
  */
 
 import '@/global.css';
 
 import { Platform } from 'react-native';
 
-export const Colors = {
-  light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-    accent: '#0f766e',
-  },
-  dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-    accent: '#2dd4bf',
-  },
-} as const;
+import tokens from '@/constants/design-tokens.json';
+
+export const Colors = tokens.colors;
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
@@ -34,10 +23,9 @@ export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
  * アイコン形状差（face-meh→face-frown→face-grimace→face-dizzy）と併用し、
  * 色だけに依存しない識別を担保する。
  */
-export const PainColors = {
-  light: ['#f87171', '#ef4444', '#b91c1c', '#7f1d1d'],
-  dark: ['#fca5a5', '#f87171', '#dc2626', '#991b1b'],
-} as const;
+export const PainColors = tokens.painColors;
+
+export const Spacing = tokens.spacing;
 
 export const Fonts = Platform.select({
   ios: {
@@ -63,16 +51,6 @@ export const Fonts = Platform.select({
     mono: 'var(--font-mono)',
   },
 });
-
-export const Spacing = {
-  half: 2,
-  one: 4,
-  two: 8,
-  three: 16,
-  four: 24,
-  five: 32,
-  six: 64,
-} as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;

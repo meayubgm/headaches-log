@@ -1,0 +1,35 @@
+{
+  "colors": {
+    "light": {
+      "text": "#000000",
+      "background": "#ffffff",
+      "backgroundElement": "#F0F0F3",
+      "backgroundSelected": "#E0E1E6",
+      "textSecondary": "#60646C",
+      "accent": "#0f766e",
+      "danger": "#DC2626"
+    },
+    "dark": {
+      "text": "#ffffff",
+      "background": "#000000",
+      "backgroundElement": "#212225",
+      "backgroundSelected": "#2E3135",
+      "textSecondary": "#B0B4BA",
+      "accent": "#2dd4bf",
+      "danger": "#DC2626"
+    }
+  },
+  "painColors": {
+    "light": ["#93C5FD", "#60A5FA", "#818CF8", "#6366F1"],
+    "dark": ["#93C5FD", "#60A5FA", "#818CF8", "#6366F1"]
+  },
+  "spacing": {
+    "half": 2,
+    "one": 4,
+    "two": 8,
+    "three": 16,
+    "four": 24,
+    "five": 32,
+    "six": 64
+  }
+}

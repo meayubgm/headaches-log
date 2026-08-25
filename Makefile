@@ -1,4 +1,4 @@
-.PHONY: setup dev-web dev-native down db-up db-down db-migrate db-studio lint typecheck test
+.PHONY: setup build dev-native down db-up db-down db-migrate db-studio lint typecheck test
 
 # 初回セットアップ: 依存関係インストール + .env雛形 + Supabaseローカル環境起動
 setup:
@@ -7,14 +7,14 @@ setup:
 	npx supabase start
 
 # Web開発サーバー（docker compose）
-dev-web:
+build:
 	docker compose up --build web
 
 # iOS/Androidの開発ビルド起動（ホスト側で実行。EAS dev client前提）
 dev-native:
 	npx expo start --dev-client
 
-# dev-webで起動したWebコンテナの停止
+# buildで起動したWebコンテナの停止
 down:
 	docker compose down
 

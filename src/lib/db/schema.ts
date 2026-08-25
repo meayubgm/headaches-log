@@ -1,6 +1,10 @@
 import { sql } from 'drizzle-orm';
 import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
+// このファイルは drizzle-kit によるマイグレーションSQL生成のための定義であり、
+// アプリのクエリには使わない（クエリは repositories/ 配下の生SQL + expo-sqlite 非同期API）。
+// 理由は client.ts のコメントおよび CLAUDE.md「ローカルDBアクセス方針」を参照。
+//
 // 同期系カラムの共通方針:
 // - id は Supabase 側と共有する UUID 文字列（クライアント側で発行）
 // - _dirty: 1 ならローカル変更未送信、0 なら同期済み

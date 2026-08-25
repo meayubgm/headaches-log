@@ -1,17 +1,17 @@
-import { FontAwesome6 } from '@expo/vector-icons';
-import type { ComponentProps } from 'react';
+import { FontAwesome6 } from "@expo/vector-icons";
+import type { ComponentProps } from "react";
 
-import { PainColors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import type { PainLevel } from "@/constants/pain-levels";
+import { usePainColor } from "@/hooks/use-pain-color";
 
-/** 痛み度合い4段階（1=軽 〜 4=重） */
-export type PainLevel = 1 | 2 | 3 | 4;
-
-const ICON_NAMES: Record<PainLevel, ComponentProps<typeof FontAwesome6>['name']> = {
-  1: 'face-meh',
-  2: 'face-frown',
-  3: 'face-grimace',
-  4: 'face-dizzy',
+const ICON_NAMES: Record<
+  PainLevel,
+  ComponentProps<typeof FontAwesome6>["name"]
+> = {
+  1: "face-meh",
+  2: "face-frown",
+  3: "face-grimace",
+  4: "face-dizzy",
 };
 
 export type PainFaceIconProps = {
@@ -20,9 +20,10 @@ export type PainFaceIconProps = {
 };
 
 export function PainFaceIcon({ level, size = 32 }: PainFaceIconProps) {
-  const scheme = useColorScheme();
-  const theme = scheme === 'dark' ? 'dark' : 'light';
-  const color = PainColors[theme][level - 1];
+  const color = usePainColor(level);
 
-  return <FontAwesome6 name={ICON_NAMES[level]} size={size} color={color} />;
+  // 塗りつぶし（Solid）スタイルの指定は `solid` ブール値で行う。
+  // `iconStyle="solid"` は型チェックを通るが実行時には無視され、
+  // FontAwesome6Free-Regular（線画）のまま描画されるので注意。
+  return <FontAwesome6 name={ICON_NAMES[level]} solid size={size} color={color} />;
 }
