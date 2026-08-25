@@ -1,6 +1,6 @@
 # Expo for Web の開発サーバー用コンテナ
 # iOS/Androidのネイティブビルドはホスト側で行うため対象外（Docker.mdを参照）
-FROM node:22-slim
+FROM node:24-slim
 
 WORKDIR /app
 
