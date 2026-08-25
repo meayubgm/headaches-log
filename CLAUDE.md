@@ -37,7 +37,9 @@ npx expo export --platform web  # Webビルド確認
 Makefile に開発コマンドを集約している（`make <target>` で実行）:
 - `make setup` — `npm install` + `.env` 雛形コピー + Supabaseローカル環境起動
 - `make build` — Web開発サーバーをdocker composeで起動
-- `make dev-native` — ホスト側で `expo start --dev-client`
+- `make emu-up` — Androidエミュレータをバックグラウンド起動（`AVD=<名前>` で切り替え）
+- `make up-native` — ホスト側で `expo start --dev-client`（`adb reverse` も併せて実行）
+- `make down-native` — Metro停止 + `adb reverse` 解除 + エミュレータ終了
 - `make db-up` / `make db-down` — Supabaseローカル環境（Postgres/Auth/Realtime等）の起動/停止
 - `make db-migrate` — `supabase db push`（Postgres側マイグレーション適用）
 - `make lint` / `make typecheck`

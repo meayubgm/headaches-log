@@ -15,7 +15,7 @@
 - ローカルDB: [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/)（オフラインファーストの正データ）。[drizzle-orm](https://orm.drizzle.team/) はスキーマ定義とマイグレーションSQLの生成に使用
 - バックエンド: [Supabase](https://supabase.com/)（Postgres, Auth, Row Level Security）
 
-iOS/Android/Web を単一コードベースでカバーしています。`expo-sqlite` などネイティブ機能を使うため **Expo Go では動作しません**。ネイティブ実行には `expo-dev-client` + EAS Build が必要です。
+iOS/Android/Web を単一コードベースでカバーしています。`expo-sqlite` などネイティブ機能を使うため **Expo Go では動作しません**。ネイティブ実行には `expo-dev-client` を含む開発ビルドが必要です。開発ビルドはローカルビルド（`npx expo run:android` / `npx expo run:ios`）でも EAS Build でも作成できます。
 
 ## セットアップ
 
@@ -39,7 +39,9 @@ iOS/Android/Web を単一コードベースでカバーしています。`expo-s
 
 ```bash
 make build       # Web開発サーバーをdocker composeで起動
-make dev-native  # ホスト側で expo start --dev-client（iOS/Android向け）
+make emu-up      # Androidエミュレータを起動（AVD=<名前> で切り替え）
+make up-native   # ホスト側で Metro を起動（iOS/Android向け）
+make down-native # Metro停止 + エミュレータ終了
 ```
 
 Web版は `http://localhost:8081` でアクセスしてください。`expo-sqlite` の Web 実装（OPFS）は secure context（`localhost` または HTTPS）でのみ動作するため、LAN の IP アドレス経由では記録が保存できません。
