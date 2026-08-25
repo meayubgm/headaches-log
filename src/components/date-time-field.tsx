@@ -1,4 +1,7 @@
-import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import DateTimePicker, {
+  DateTimePickerAndroid,
+  type DateTimePickerEvent,
+} from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
 
@@ -10,39 +13,61 @@ export type DateTimeFieldProps = {
   maximumDate?: Date;
 };
 
-type PickerMode = 'date' | 'time' | null;
+/** Android の time ピッカーは maximumDate を無視するため、確定値をこちら側で丸める */
+function clampToMaximum(date: Date, maximumDate?: Date): Date {
+  if (maximumDate && date.getTime() > maximumDate.getTime()) {
+    return new Date(maximumDate);
+  }
+
+  return date;
+}
 
 /**
  * 発生時刻の編集。Web 版は date-time-field.web.tsx（<input type="datetime-local">）。
- * Android は日付と時刻を同じモーダルで出せないため date → time の2段で開く。
+ * Android は日付と時刻を同じダイアログで出せないため date → time の2段で開く。
  */
 export function DateTimeField({ value, onChange, maximumDate }: DateTimeFieldProps) {
-  const [mode, setMode] = useState<PickerMode>(null);
-  const [draft, setDraft] = useState(value);
+  const [isPickerVisible, setPickerVisible] = useState(false);
 
-  const handleChange = (event: DateTimePickerEvent, selected?: Date) => {
-    if (event.type === 'dismissed' || !selected) {
-      setMode(null);
+  /**
+   * Android は命令型APIでダイアログを開く。宣言的レンダリングで mode prop を
+   * date → time と差し替える方式では、閉じたダイアログが再オープンしない。
+   */
+  const openAndroidPicker = () => {
+    DateTimePickerAndroid.open({
+      value,
+      mode: 'date',
+      maximumDate,
+      onChange: (dateEvent, selectedDate) => {
+        if (dateEvent.type !== 'set' || !selectedDate) {
+          return;
+        }
+
+        DateTimePickerAndroid.open({
+          value: selectedDate,
+          mode: 'time',
+          onChange: (timeEvent, selectedTime) => {
+            if (timeEvent.type !== 'set' || !selectedTime) {
+              return;
+            }
+
+            const merged = new Date(selectedDate);
+            merged.setHours(selectedTime.getHours(), selectedTime.getMinutes(), 0, 0);
+            onChange(clampToMaximum(merged, maximumDate));
+          },
+        });
+      },
+    });
+  };
+
+  const handleIosChange = (event: DateTimePickerEvent, selected?: Date) => {
+    setPickerVisible(false);
+
+    if (event.type !== 'set' || !selected) {
       return;
     }
 
-    if (Platform.OS === 'ios') {
-      setMode(null);
-      onChange(selected);
-      return;
-    }
-
-    if (mode === 'date') {
-      // 日付だけ確定させ、続けて時刻ピッカーを開く
-      setDraft(selected);
-      setMode('time');
-      return;
-    }
-
-    const merged = new Date(draft);
-    merged.setHours(selected.getHours(), selected.getMinutes(), 0, 0);
-    setMode(null);
-    onChange(merged);
+    onChange(clampToMaximum(selected, maximumDate));
   };
 
   return (
@@ -52,8 +77,12 @@ export function DateTimeField({ value, onChange, maximumDate }: DateTimeFieldPro
       </Text>
       <Pressable
         onPress={() => {
-          setDraft(value);
-          setMode('date');
+          if (Platform.OS === 'android') {
+            openAndroidPicker();
+            return;
+          }
+
+          setPickerVisible(true);
         }}
         accessibilityRole="button"
         accessibilityLabel="発生時刻を変更"
@@ -61,12 +90,12 @@ export function DateTimeField({ value, onChange, maximumDate }: DateTimeFieldPro
         <Text className="text-sm text-fg dark:text-fg-dark">変更</Text>
       </Pressable>
 
-      {mode !== null && (
+      {isPickerVisible && (
         <DateTimePicker
-          value={mode === 'time' ? draft : value}
-          mode={Platform.OS === 'ios' ? 'datetime' : mode}
+          value={value}
+          mode="datetime"
           maximumDate={maximumDate}
-          onChange={handleChange}
+          onChange={handleIosChange}
         />
       )}
     </View>

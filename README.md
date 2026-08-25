@@ -40,9 +40,14 @@ iOS/Android/Web を単一コードベースでカバーしています。`expo-s
 ```bash
 make build       # Web開発サーバーをdocker composeで起動
 make emu-up      # Androidエミュレータを起動（AVD=<名前> で切り替え）
+make run-android # Android開発ビルドを作成して端末/エミュレータにインストール
 make up-native   # ホスト側で Metro を起動（iOS/Android向け）
 make down-native # Metro停止 + エミュレータ終了
 ```
+
+`make run-android` が必要なのは、その端末に初めてアプリを入れるとき、ネイティブ依存を追加・更新したとき、`app.json` のネイティブ設定や Expo SDK を変えたときです。JS/TS だけの変更は `make up-native`（Metro）の再バンドルで反映されるため、作り直す必要はありません。
+
+Androidのネイティブビルドには Android SDK（platform 36 と NDK）と JDK 17/21 が必要です。Makefile は `ANDROID_HOME` を `~/Library/Android/sdk`、`JAVA_HOME` を Android Studio 同梱の JDK にそれぞれ既定値として設定し、Gradle へ渡します。別の場所に入れている場合は `make run-android ANDROID_HOME=<パス> JAVA_HOME=<パス>` のように上書きしてください。実機に入れる場合は `make run-android DEVICE=<adb で見えるデバイス名>` を使います。
 
 Web版は `http://localhost:8081` でアクセスしてください。`expo-sqlite` の Web 実装（OPFS）は secure context（`localhost` または HTTPS）でのみ動作するため、LAN の IP アドレス経由では記録が保存できません。
 

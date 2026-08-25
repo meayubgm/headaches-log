@@ -1,4 +1,4 @@
-.PHONY: setup build up-native down-native emu-up down db-up db-down db-migrate db-studio lint typecheck test
+.PHONY: setup build run-android up-native down-native emu-up down db-up db-down db-migrate db-studio lint typecheck test
 
 # ネイティブ開発用の設定（環境に合わせて上書き可能）
 ANDROID_HOME ?= $(HOME)/Library/Android/sdk
@@ -6,6 +6,13 @@ ADB := $(ANDROID_HOME)/platform-tools/adb
 EMULATOR := $(ANDROID_HOME)/emulator/emulator
 AVD ?= Pixel_9
 METRO_PORT ?= 8081
+# 実機の場合は DEVICE=<adb で見えるデバイス名> を指定する
+DEVICE ?= $(AVD)
+# Gradle/AGP は JDK 17 か 21 を要求するため、Android Studio 同梱の JDK を既定にする
+JAVA_HOME ?= /Applications/Android Studio.app/Contents/jbr/Contents/Home
+# Gradle は環境変数の ANDROID_HOME / JAVA_HOME を参照するので子プロセスへ渡す
+export ANDROID_HOME
+export JAVA_HOME
 
 # 初回セットアップ: 依存関係インストール + .env雛形 + Supabaseローカル環境起動
 setup:
@@ -20,6 +27,11 @@ build:
 # Androidエミュレータをバックグラウンド起動（AVD=<名前> で切り替え）
 emu-up:
 	$(EMULATOR) -avd $(AVD) > /dev/null 2>&1 &
+
+# Android開発ビルドを作成して端末/エミュレータにインストールする
+# 初回と、ネイティブ依存やapp.jsonのネイティブ設定を変えたときに実行する（JS/TSの変更だけなら不要）
+run-android:
+	npx expo run:android --device "$(DEVICE)"
 
 # iOS/AndroidのMetro起動（ホスト側で実行。開発ビルドを端末に入れてあることが前提）
 # adb reverse は端末が繋がっていない場合に失敗するが、動作に影響しないため無視する

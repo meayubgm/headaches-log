@@ -21,14 +21,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - スタイリング: NativeWind（Tailwind for RN）。グローバルCSSは `src/global.css`
 - ローカルDB: `expo-sqlite`（オフラインファーストの正データ）。`drizzle-orm` / `drizzle-kit` は**スキーマ定義とマイグレーションSQLの生成にのみ**使い、クエリは expo-sqlite の非同期API＋生SQLで書く（理由は下記「ローカルDBアクセス方針」）
 - バックエンド: Supabase（Postgres, Auth, RLS）。認証は匿名サインインをデフォルトにし、本登録時に同一 `auth.users.id` のままリンク昇格させる設計
-- **Expo Go では動作しない**（`expo-sqlite` 等ネイティブ機能を使うため）。ネイティブ実行は `expo-dev-client` + EAS Build が前提
+- **Expo Go では動作しない**（`expo-sqlite` 等ネイティブ機能を使うため）。ネイティブ実行には `expo-dev-client` を含む開発ビルドが必要で、ローカルビルド（`npx expo run:android` / `npx expo run:ios`）でも EAS Build でも作成できる
 
 ## よく使うコマンド
 
 ```bash
 npm install                  # 依存関係インストール
 npx expo start --web         # Web開発サーバー（ホスト側で直接）
-npx expo start --dev-client  # iOS/Android開発ビルド起動（ホスト側、EAS dev client前提）
+npx expo start --dev-client  # iOS/Android開発ビルド起動（ホスト側、開発ビルドを端末に入れてあること）
 npx expo lint                # ESLint
 npx tsc --noEmit             # 型チェック
 npx expo export --platform web  # Webビルド確認
@@ -38,6 +38,7 @@ Makefile に開発コマンドを集約している（`make <target>` で実行�
 - `make setup` — `npm install` + `.env` 雛形コピー + Supabaseローカル環境起動
 - `make build` — Web開発サーバーをdocker composeで起動
 - `make emu-up` — Androidエミュレータをバックグラウンド起動（`AVD=<名前>` で切り替え）
+- `make run-android` — Android開発ビルドを作成して端末/エミュレータにインストール（初回・ネイティブ依存や `app.json` のネイティブ設定を変えたときのみ。JS/TSの変更だけなら不要）。Gradle 向けに `ANDROID_HOME` と `JAVA_HOME`（Android Studio 同梱のJDK 21）を Makefile から export している。実機は `DEVICE=<デバイス名>` で指定
 - `make up-native` — ホスト側で `expo start --dev-client`（`adb reverse` も併せて実行）
 - `make down-native` — Metro停止 + `adb reverse` 解除 + エミュレータ終了
 - `make db-up` / `make db-down` — Supabaseローカル環境（Postgres/Auth/Realtime等）の起動/停止
