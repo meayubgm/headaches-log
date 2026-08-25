@@ -25,7 +25,7 @@ export function HeadacheTypeChips({ types, selectedIds, onToggle }: HeadacheType
             className={[
               'min-h-[44px] justify-center rounded-full border px-four',
               selected
-                ? 'border-accent bg-accent dark:border-accent-dark dark:bg-accent-dark'
+                ? 'border-primary bg-primary dark:border-primary-dark dark:bg-primary-dark'
                 : 'border-surface-selected bg-bg dark:border-surface-selected-dark dark:bg-bg-dark',
             ].join(' ')}>
             <Text

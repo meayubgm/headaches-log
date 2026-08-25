@@ -129,7 +129,7 @@ export default function HomeScreen() {
               'min-h-[52px] items-center justify-center rounded-xl',
               painLevel === null || saving
                 ? 'bg-surface dark:bg-surface-dark'
-                : 'bg-accent dark:bg-accent-dark',
+                : 'bg-primary dark:bg-primary-dark',
             ].join(' ')}>
             <Text
               className={[

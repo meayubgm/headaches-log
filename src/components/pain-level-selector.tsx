@@ -26,7 +26,7 @@ export function PainLevelSelector({ value, onSelect }: PainLevelSelectorProps) {
             className={[
               'flex-1 items-center gap-two rounded-2xl border-2 py-three',
               selected
-                ? 'border-accent bg-surface-selected dark:border-accent-dark dark:bg-surface-selected-dark'
+                ? 'border-primary bg-surface-selected dark:border-primary-dark dark:bg-surface-selected-dark'
                 : 'border-transparent bg-surface dark:bg-surface-dark',
             ].join(' ')}>
             <PainFaceIcon level={level} size={44} />

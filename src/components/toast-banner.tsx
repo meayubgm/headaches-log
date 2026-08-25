@@ -34,7 +34,7 @@ export function ToastBanner({ toast, onDismiss, durationMs = 3000 }: ToastBanner
   return (
     <View
       accessibilityLiveRegion="polite"
-      className="rounded-xl bg-accent px-four py-three dark:bg-accent-dark">
+      className="rounded-xl bg-primary px-four py-three dark:bg-primary-dark">
       <Text className="text-center text-sm font-bold text-white dark:text-black">
         {toast.message}
       </Text>

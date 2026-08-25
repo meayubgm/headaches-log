@@ -6,7 +6,7 @@
       "backgroundElement": "#F0F0F3",
       "backgroundSelected": "#E0E1E6",
       "textSecondary": "#60646C",
-      "accent": "#0f766e",
+      "primary": "#0D9488",
       "danger": "#DC2626"
     },
     "dark": {
@@ -15,13 +15,13 @@
       "backgroundElement": "#212225",
       "backgroundSelected": "#2E3135",
       "textSecondary": "#B0B4BA",
-      "accent": "#2dd4bf",
+      "primary": "#2dd4bf",
       "danger": "#DC2626"
     }
   },
   "painColors": {
-    "light": ["#93C5FD", "#60A5FA", "#818CF8", "#6366F1"],
-    "dark": ["#93C5FD", "#60A5FA", "#818CF8", "#6366F1"]
+    "light": ["#FDBA74", "#FB7185", "#6366F1", "#9333EA"],
+    "dark": ["#FDBA74", "#FB7185", "#6366F1", "#9333EA"]
   },
   "spacing": {
     "half": 2,

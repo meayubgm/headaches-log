@@ -29,7 +29,7 @@ module.exports = {
           DEFAULT: tokens.colors.light.backgroundSelected,
           dark: tokens.colors.dark.backgroundSelected,
         },
-        accent: { DEFAULT: tokens.colors.light.accent, dark: tokens.colors.dark.accent },
+        primary: { DEFAULT: tokens.colors.light.primary, dark: tokens.colors.dark.primary },
         danger: { DEFAULT: tokens.colors.light.danger, dark: tokens.colors.dark.danger },
         pain: {
           1: tokens.painColors.light[0],

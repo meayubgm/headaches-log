@@ -18,8 +18,8 @@ export const Colors = tokens.colors;
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 /**
- * 痛み度合い4段階（軽→重）の配色。単一色相(赤系)×明度/彩度の段階変化による
- * ordinalスケール（dataviz スキルの validate_palette.js --ordinal で検証済み）。
+ * 痛み度合い4段階（軽→重）の配色。オレンジ→ローズ→インディゴ→パープルと
+ * 色相を回しつつ明度を落としていくordinalスケールで、ライト/ダーク同値。
  * アイコン形状差（face-meh→face-frown→face-grimace→face-dizzy）と併用し、
  * 色だけに依存しない識別を担保する。
  */
