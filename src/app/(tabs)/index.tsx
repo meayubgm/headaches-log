@@ -11,10 +11,13 @@ import { useHeadacheTypes } from '@/hooks/use-headache-types';
 import { useRecentHeadaches } from '@/hooks/use-recent-headaches';
 import { createHeadache } from '@/lib/db/repositories/headaches';
 import type { HeadacheTypeId } from '@/lib/db/repositories/types';
-import { formatFullDate } from '@/lib/format-date';
+import { formatFullDate, parseDateKey } from '@/lib/format-date';
 import { formatError } from '@/lib/format-error';
+import { useTodayKey } from '@/lib/today';
 
 export default function HomeScreen() {
+  // 見出しの日付も、フォアグラウンドのまま日付をまたいだら張り替える
+  const todayKey = useTodayKey();
   const typesState = useHeadacheTypes();
   const recentState = useRecentHeadaches();
 
@@ -85,7 +88,7 @@ export default function HomeScreen() {
           <View className="gap-half">
             <Text className="text-2xl font-bold text-fg dark:text-fg-dark">頭痛ログ</Text>
             <Text className="text-sm text-fg-muted dark:text-fg-muted-dark">
-              {formatFullDate(new Date())}
+              {formatFullDate(parseDateKey(todayKey))}
             </Text>
           </View>
 

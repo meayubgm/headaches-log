@@ -1,4 +1,4 @@
-.PHONY: setup build run-android run-ios up-native down-native emu-up down db-up db-down db-migrate db-studio lint typecheck test
+.PHONY: setup build run-android run-ios up-native reconnect-native down-native emu-up down db-up db-down db-migrate db-studio lint typecheck test
 
 # ネイティブ開発用の設定（環境に合わせて上書き可能）
 ANDROID_HOME ?= $(HOME)/Library/Android/sdk
@@ -6,6 +6,8 @@ ADB := $(ANDROID_HOME)/platform-tools/adb
 EMULATOR := $(ANDROID_HOME)/emulator/emulator
 AVD ?= Pixel_9
 METRO_PORT ?= 8081
+# app.json の expo.scheme。開発サーバーへの繋ぎ直し（reconnect-native）で使う
+SCHEME ?= headacheslog
 # 実機の場合は DEVICE=<adb で見えるデバイス名> を指定する
 DEVICE ?= $(AVD)
 # iOSシミュレータ名（xcrun simctl list devices で確認できる）
@@ -47,6 +49,20 @@ run-ios:
 up-native:
 	-$(ADB) reverse tcp:$(METRO_PORT) tcp:$(METRO_PORT)
 	npx expo start --dev-client --port $(METRO_PORT)
+
+# 起動中のアプリを開発サーバーへ繋ぎ直す（Metroは別ターミナルで起動しておくこと）
+# Metroより先にアプリを起動した等の理由で開発サーバーに繋がらないと、
+# アプリはビルド時にAPK/IPAへ埋め込まれた古いバンドルを再生し続ける。
+# コードを直したのに挙動が変わらないときは、Metroのログに
+# `Android Bundled ...` / `iOS Bundled ...` が出ているかを見て、出ていなければこれを実行する。
+# 端末が繋がっていない側は失敗するが、動作に影響しないため無視する。
+# iOSシミュレータはアプリが起動していないと「"headaches-log" で開きますか？」の確認が出るので、
+# その場合は「開く」をタップする（起動中ならそのまま繋ぎ直る）
+reconnect-native:
+	-$(ADB) reverse tcp:$(METRO_PORT) tcp:$(METRO_PORT)
+	-$(ADB) shell am start -a android.intent.action.VIEW \
+		-d "$(SCHEME)://expo-development-client/?url=http%3A%2F%2Flocalhost%3A$(METRO_PORT)"
+	-xcrun simctl openurl booted "$(SCHEME)://expo-development-client/?url=http://localhost:$(METRO_PORT)"
 
 # ネイティブ確認環境の終了（Metro停止 + adb reverse解除 + エミュレータ終了）
 down-native:

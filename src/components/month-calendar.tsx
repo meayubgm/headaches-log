@@ -4,6 +4,7 @@ import { PAIN_LEVEL_LABELS, type PainLevel } from '@/constants/pain-levels';
 import type { DaySummary } from '@/lib/calendar';
 import { buildMonthGrid } from '@/lib/calendar';
 import { WEEKDAY_LABELS, formatDateKey, formatYearMonth } from '@/lib/format-date';
+import { useTodayKey } from '@/lib/today';
 
 /**
  * 痛み度合いのドット色。`usePainColor()` を使わず className で解決できるので、
@@ -70,7 +71,7 @@ export function MonthCalendar({
   maxMonth,
 }: MonthCalendarProps) {
   const weeks = buildMonthGrid(visibleMonth.getFullYear(), visibleMonth.getMonth());
-  const todayKey = formatDateKey(new Date());
+  const todayKey = useTodayKey();
   const nextDisabled = maxMonth !== undefined && isSameMonth(visibleMonth, maxMonth);
 
   return (

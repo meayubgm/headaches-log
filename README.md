@@ -43,10 +43,13 @@ make emu-up      # Androidエミュレータを起動（AVD=<名前> で切り�
 make run-android # Android開発ビルドを作成して端末/エミュレータにインストール
 make run-ios     # iOS開発ビルドを作成してシミュレータにインストール（SIMULATOR=<名前> で切り替え）
 make up-native   # ホスト側で Metro を起動（iOS/Android向け）
+make reconnect-native # 起動中のアプリを Metro に繋ぎ直す
 make down-native # Metro停止 + エミュレータ終了
 ```
 
 `make run-android` / `make run-ios` が必要なのは、その端末に初めてアプリを入れるとき、ネイティブ依存を追加・更新したとき、`app.json` のネイティブ設定や Expo SDK を変えたときです。JS/TS だけの変更は `make up-native`（Metro）の再バンドルで反映されるため、作り直す必要はありません。
+
+コードを直したのに端末上の挙動が変わらないときは、アプリが Metro ではなくビルド時に埋め込まれた古いバンドルを再生している可能性があります（Metro より先にアプリを起動した場合など）。Metro のログに `Android Bundled ...` / `iOS Bundled ...` が出ているかを確認し、出ていなければ `make reconnect-native` で繋ぎ直してください。
 
 Androidのネイティブビルドには Android SDK（platform 36 と NDK）と JDK 17/21 が必要です。Makefile は `ANDROID_HOME` を `~/Library/Android/sdk`、`JAVA_HOME` を Android Studio 同梱の JDK にそれぞれ既定値として設定し、Gradle へ渡します。別の場所に入れている場合は `make run-android ANDROID_HOME=<パス> JAVA_HOME=<パス>` のように上書きしてください。実機に入れる場合は `make run-android DEVICE=<adb で見えるデバイス名>` を使います。
 

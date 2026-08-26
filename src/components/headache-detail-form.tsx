@@ -48,7 +48,11 @@ export function HeadacheDetailForm({
       </Section>
 
       <Section title="発生時刻">
-        <DateTimeField value={occurredAt} onChange={onChangeOccurredAt} maximumDate={new Date()} />
+        <DateTimeField
+          value={occurredAt}
+          onChange={onChangeOccurredAt}
+          getMaximumDate={() => new Date()}
+        />
         <View className="flex-row flex-wrap gap-two">
           {TIME_SHORTCUTS.map(({ label, minutesAgo }) => (
             <Pressable

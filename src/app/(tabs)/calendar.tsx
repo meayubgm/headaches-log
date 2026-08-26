@@ -8,22 +8,20 @@ import { MonthCalendar } from '@/components/month-calendar';
 import { useHeadacheTypes } from '@/hooks/use-headache-types';
 import { useHeadachesInRange } from '@/hooks/use-headaches-in-range';
 import { buildMonthGrid, getGridRange, startOfMonth, summarizeByDay } from '@/lib/calendar';
-import { formatDateKey, formatFullDate } from '@/lib/format-date';
+import { formatDateKey, formatFullDate, parseDateKey } from '@/lib/format-date';
 import { formatError } from '@/lib/format-error';
-
-/** 'YYYY-MM-DD' をローカル日付の Date に戻す（new Date(文字列) は UTC 解釈になるため使わない） */
-function parseDateKey(dateKey: string): Date {
-  const [year, month, day] = dateKey.split('-').map(Number);
-  return new Date(year, month - 1, day);
-}
+import { useTodayKey } from '@/lib/today';
 
 export default function CalendarScreen() {
-  // 日付をマウント時に固定すると、アプリを起動したまま月をまたいだときに
-  // 「次の月へ」が旧・当月で無効化されたままになるので、毎レンダー現在時刻から求める。
-  const currentMonth = startOfMonth(new Date().getFullYear(), new Date().getMonth());
+  // 日付をまたいだら「次の月へ」の活性と当日の強調が追従するよう、
+  // マウント時に固定せず useTodayKey()（深夜0時のタイマー＋復帰時に更新）から求める。
+  const todayKey = useTodayKey();
+  const today = parseDateKey(todayKey);
+  const currentMonth = startOfMonth(today.getFullYear(), today.getMonth());
 
   const [visibleMonth, setVisibleMonth] = useState(currentMonth);
-  const [selectedDateKey, setSelectedDateKey] = useState(() => formatDateKey(new Date()));
+  // 選択日は初期値だけ「今日」。日付をまたいでもユーザーの選択は動かさない
+  const [selectedDateKey, setSelectedDateKey] = useState(todayKey);
 
   const typesState = useHeadacheTypes();
   const types = typesState.status === 'ready' ? typesState.data : [];

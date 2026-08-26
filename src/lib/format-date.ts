@@ -36,3 +36,9 @@ export function formatYearMonth(date: Date): string {
 export function formatDateKey(date: Date): string {
   return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
 }
+
+/** 日付キー（例: 2026-08-24）をローカル日付の Date に戻す（new Date(文字列) は UTC 解釈になるため使わない） */
+export function parseDateKey(dateKey: string): Date {
+  const [year, month, day] = dateKey.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}

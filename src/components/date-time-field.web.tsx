@@ -28,7 +28,9 @@ function fromInputValue(value: string): Date | null {
   return new Date(Number(year), Number(month) - 1, Number(day), Number(hours), Number(minutes));
 }
 
-export function DateTimeField({ value, onChange, maximumDate }: DateTimeFieldProps) {
+export function DateTimeField({ value, onChange, getMaximumDate }: DateTimeFieldProps) {
+  const maximumDate = getMaximumDate?.();
+
   return (
     <View className="flex-row items-center">
       <input

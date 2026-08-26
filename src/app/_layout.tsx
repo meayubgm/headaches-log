@@ -16,7 +16,11 @@ export default function RootLayout() {
       <SplashGate>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="headaches/[id]" options={{ title: '記録の詳細' }} />
+          {/* headerBackTitle を指定しないと、iOS の戻るボタンにルートグループ名の「(tabs)」が出る */}
+          <Stack.Screen
+            name="headaches/[id]"
+            options={{ title: '記録の詳細', headerBackTitle: '戻る' }}
+          />
         </Stack>
       </SplashGate>
     </ThemeProvider>
