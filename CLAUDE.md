@@ -39,6 +39,7 @@ Makefile に開発コマンドを集約している（`make <target>` で実行�
 - `make build` — Web開発サーバーをdocker composeで起動
 - `make emu-up` — Androidエミュレータをバックグラウンド起動（`AVD=<名前>` で切り替え）
 - `make run-android` — Android開発ビルドを作成して端末/エミュレータにインストール（初回・ネイティブ依存や `app.json` のネイティブ設定を変えたときのみ。JS/TSの変更だけなら不要）。Gradle 向けに `ANDROID_HOME` と `JAVA_HOME`（Android Studio 同梱のJDK 21）を Makefile から export している。実機は `DEVICE=<デバイス名>` で指定
+- `make run-ios` — iOS開発ビルドを作成してシミュレータにインストール（`SIMULATOR=<名前>` で切り替え。既定は `iPhone 17 Pro`）。実行条件は `make run-android` と同じ
 - `make up-native` — ホスト側で `expo start --dev-client`（`adb reverse` も併せて実行）
 - `make down-native` — Metro停止 + `adb reverse` 解除 + エミュレータ終了
 - `make db-up` / `make db-down` — Supabaseローカル環境（Postgres/Auth/Realtime等）の起動/停止
@@ -46,6 +47,12 @@ Makefile に開発コマンドを集約している（`make <target>` で実行�
 - `make lint` / `make typecheck`
 
 テスト基盤（Jest等）は未導入。`make test` は現状動作しない。
+
+### iOSビルドの注意
+
+Xcode を更新した直後は iOS プラットフォーム（SDK 実体とシミュレータランタイム）が未インストールで、`xcodebuild` が `Unable to find a destination matching the provided destination specifier`／`iOS <version> is not installed` を返すことがある。`xcodebuild -showsdks` には SDK が並ぶのに `-showdestinations` が空になるのが目印で、`xcodebuild -downloadPlatform iOS`（数GBのダウンロード）で解消する。
+
+`ios/` は `.gitignore` 済みで prebuild の生成物なので、消しても `npx expo prebuild --platform ios` で作り直せる。ただし `ios/build/generated/` には ReactCodegen の生成ソースが入っており、ここだけ消すと `Build input file cannot be found` になる。`npx pod-install` で再生成する。
 
 ### ローカルDBスキーマを変更する場合
 

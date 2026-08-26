@@ -1,4 +1,4 @@
-.PHONY: setup build run-android up-native down-native emu-up down db-up db-down db-migrate db-studio lint typecheck test
+.PHONY: setup build run-android run-ios up-native down-native emu-up down db-up db-down db-migrate db-studio lint typecheck test
 
 # ネイティブ開発用の設定（環境に合わせて上書き可能）
 ANDROID_HOME ?= $(HOME)/Library/Android/sdk
@@ -8,6 +8,8 @@ AVD ?= Pixel_9
 METRO_PORT ?= 8081
 # 実機の場合は DEVICE=<adb で見えるデバイス名> を指定する
 DEVICE ?= $(AVD)
+# iOSシミュレータ名（xcrun simctl list devices で確認できる）
+SIMULATOR ?= iPhone 17 Pro
 # Gradle/AGP は JDK 17 か 21 を要求するため、Android Studio 同梱の JDK を既定にする
 JAVA_HOME ?= /Applications/Android Studio.app/Contents/jbr/Contents/Home
 # Gradle は環境変数の ANDROID_HOME / JAVA_HOME を参照するので子プロセスへ渡す
@@ -32,6 +34,13 @@ emu-up:
 # 初回と、ネイティブ依存やapp.jsonのネイティブ設定を変えたときに実行する（JS/TSの変更だけなら不要）
 run-android:
 	npx expo run:android --device "$(DEVICE)"
+
+# iOS開発ビルドを作成してシミュレータにインストールする
+# 初回と、ネイティブ依存やapp.jsonのネイティブ設定を変えたときに実行する（JS/TSの変更だけなら不要）
+# Xcodeを更新した直後は iOS プラットフォームが未インストールなことがある。
+# その場合は `xcodebuild -downloadPlatform iOS` を先に実行する
+run-ios:
+	npx expo run:ios --device "$(SIMULATOR)"
 
 # iOS/AndroidのMetro起動（ホスト側で実行。開発ビルドを端末に入れてあることが前提）
 # adb reverse は端末が繋がっていない場合に失敗するが、動作に影響しないため無視する
