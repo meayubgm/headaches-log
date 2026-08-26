@@ -36,15 +36,15 @@ npx expo export --platform web  # Webビルド確認
 
 Makefile に開発コマンドを集約している（`make <target>` で実行）:
 - `make setup` — `npm install` + `.env` 雛形コピー + Supabaseローカル環境起動
-- `make build` — Web開発サーバーをdocker composeで起動
-- `make emu-up` — Androidエミュレータをバックグラウンド起動（`AVD=<名前>` で切り替え）
+- `make up-web` — Web開発サーバーをdocker composeで起動
+- `make up-emu` — Androidエミュレータをバックグラウンド起動（`AVD=<名前>` で切り替え）
 - `make run-android` — Android開発ビルドを作成して端末/エミュレータにインストール（初回・ネイティブ依存や `app.json` のネイティブ設定を変えたときのみ。JS/TSの変更だけなら不要）。Gradle 向けに `ANDROID_HOME` と `JAVA_HOME`（Android Studio 同梱のJDK 21）を Makefile から export している。実機は `DEVICE=<デバイス名>` で指定
 - `make run-ios` — iOS開発ビルドを作成してシミュレータにインストール（`SIMULATOR=<名前>` で切り替え。既定は `iPhone 17 Pro`）。実行条件は `make run-android` と同じ
 - `make up-native` — ホスト側で `expo start --dev-client`（`adb reverse` も併せて実行）
 - `make reconnect-native` — 起動中のアプリを開発サーバーへ繋ぎ直す。Metro より先にアプリを起動した等で開発サーバーに繋がらないと、アプリはビルド時に埋め込まれた古いバンドルを再生し続ける（コードを直しても挙動が変わらない）。Metro のログに `Android Bundled ...` / `iOS Bundled ...` が出ているかが判別の目印
 - `make down-native` — Metro停止 + `adb reverse` 解除 + エミュレータ終了
-- `make db-up` / `make db-down` — Supabaseローカル環境（Postgres/Auth/Realtime等）の起動/停止
-- `make db-migrate` — `supabase db push`（Postgres側マイグレーション適用）
+- `make up-db` / `make down-db` — Supabaseローカル環境（Postgres/Auth/Realtime等）の起動/停止
+- `make migrate-db` — `supabase db push`（Postgres側マイグレーション適用）
 - `make lint` / `make typecheck`
 
 テスト基盤（Jest等）は未導入。`make test` は現状動作しない。
@@ -72,7 +72,7 @@ Xcode を更新した直後は iOS プラットフォーム（SDK 実体とシ�
 
 ### Supabase側スキーマを変更する場合
 
-`supabase/migrations/` に新しいSQLファイルを追加し、`npx supabase db push`（または `make db-migrate`）で適用する。RLSポリシーもこのマイグレーションファイル内で管理する。
+`supabase/migrations/` に新しいSQLファイルを追加し、`npx supabase db push`（または `make migrate-db`）で適用する。RLSポリシーもこのマイグレーションファイル内で管理する。
 
 ## アーキテクチャ
 

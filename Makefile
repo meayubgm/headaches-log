@@ -1,4 +1,4 @@
-.PHONY: setup build run-android run-ios up-native reconnect-native down-native emu-up down db-up db-down db-migrate db-studio lint typecheck test
+.PHONY: setup up-web down-web run-android run-ios up-emu up-native reconnect-native down-native up-db down-db migrate-db studio-db lint typecheck test
 
 # ネイティブ開発用の設定（環境に合わせて上書き可能）
 ANDROID_HOME ?= $(HOME)/Library/Android/sdk
@@ -25,11 +25,11 @@ setup:
 	npx supabase start
 
 # Web開発サーバー（docker compose）
-build:
+up-web:
 	docker compose up --build web
 
 # Androidエミュレータをバックグラウンド起動（AVD=<名前> で切り替え）
-emu-up:
+up-emu:
 	$(EMULATOR) -avd $(AVD) > /dev/null 2>&1 &
 
 # Android開発ビルドを作成して端末/エミュレータにインストールする
@@ -70,22 +70,22 @@ down-native:
 	-$(ADB) reverse --remove tcp:$(METRO_PORT)
 	-for s in $$($(ADB) devices | awk '/^emulator-/ {print $$1}'); do $(ADB) -s $$s emu kill; done
 
-# buildで起動したWebコンテナの停止
-down:
+# up-webで起動したWebコンテナの停止
+down-web:
 	docker compose down
 
 # Supabaseローカル環境の起動/停止
-db-up:
+up-db:
 	npx supabase start
 
-db-down:
+down-db:
 	npx supabase stop
 
 # Postgres側マイグレーション適用（ローカルSQLite側はアプリ起動時に自動実行）
-db-migrate:
+migrate-db:
 	npx supabase db push
 
-db-studio:
+studio-db:
 	npx supabase status
 
 lint:

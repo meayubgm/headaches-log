@@ -2,7 +2,7 @@
 #
 # Supabaseのローカル開発環境（Postgres/Auth/Realtime等）は
 # `supabase start`（= Supabase CLI）が内部で専用のdocker composeプロジェクトを
-# 起動・管理するため、ここには含めない。`make db-up` / `make setup` を参照。
+# 起動・管理するため、ここには含めない。`make up-db` / `make setup` を参照。
 #
 # iOS/Androidのネイティブビルド・実行はAppleの制約等によりホスト側のExpo CLI/EAS Buildで行う。
 services:
