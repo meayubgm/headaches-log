@@ -9,6 +9,11 @@ export function formatFullDate(date: Date): string {
   return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日（${WEEKDAY_LABELS[date.getDay()]}）`;
 }
 
+/** 例: 2026年8月24日 14:30 */
+export function formatFullDateTime(date: Date): string {
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+}
+
 /** 例: 8月24日 14:30 */
 export function formatMonthDayTime(date: Date): string {
   return `${date.getMonth() + 1}月${date.getDate()}日 ${pad2(date.getHours())}:${pad2(date.getMinutes())}`;

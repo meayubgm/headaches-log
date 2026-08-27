@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { DetailToggle } from '@/components/detail-toggle';
 import { HeadacheDetailForm } from '@/components/headache-detail-form';
 import { HeadacheList } from '@/components/headache-list';
 import { PainLevelSelector } from '@/components/pain-level-selector';
@@ -97,15 +98,7 @@ export default function HomeScreen() {
             <PainLevelSelector value={painLevel} onSelect={setPainLevel} />
           </View>
 
-          <Pressable
-            onPress={toggleDetail}
-            accessibilityRole="button"
-            accessibilityState={{ expanded: detailOpen }}
-            className="min-h-[44px] justify-center rounded-xl bg-surface px-four dark:bg-surface-dark">
-            <Text className="text-sm text-fg dark:text-fg-dark">
-              {detailOpen ? '詳細を閉じる' : '詳細を入力'}
-            </Text>
-          </Pressable>
+          <DetailToggle open={detailOpen} onPress={toggleDetail} />
 
           {detailOpen && (
             <HeadacheDetailForm

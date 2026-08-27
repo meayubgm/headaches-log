@@ -15,6 +15,13 @@
       "when": 1787560692192,
       "tag": "0001_seed_headache_types",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1787818877268,
+      "tag": "0002_remove_cluster_headache_type",
+      "breakpoints": true
     }
   ]
 }

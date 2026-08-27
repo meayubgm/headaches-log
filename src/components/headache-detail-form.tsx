@@ -1,16 +1,19 @@
 import { Pressable, Text, TextInput, View } from 'react-native';
 
+import { floorToMinute } from '@/lib/clamp-date';
 import type { HeadacheType, HeadacheTypeId } from '@/lib/db/repositories/types';
 
 import { DateTimeField } from './date-time-field';
 import { HeadacheTypeChips } from './headache-type-chips';
 
-/** 発生時刻のクイック指定（現在時刻からの遡り分数） */
-const TIME_SHORTCUTS: { label: string; minutesAgo: number }[] = [
-  { label: 'いま', minutesAgo: 0 },
+/**
+ * 発生時刻のクイック指定。minutesAgo が null なら現在時刻へ、
+ * 数値なら**いま入力されている時刻から**その分だけ遡る（連打で刻める）。
+ */
+const TIME_SHORTCUTS: { label: string; minutesAgo: number | null }[] = [
+  { label: 'いま', minutesAgo: null },
   { label: '30分前', minutesAgo: 30 },
   { label: '1時間前', minutesAgo: 60 },
-  { label: '2時間前', minutesAgo: 120 },
 ];
 
 export type HeadacheDetailFormProps = {
@@ -57,9 +60,19 @@ export function HeadacheDetailForm({
           {TIME_SHORTCUTS.map(({ label, minutesAgo }) => (
             <Pressable
               key={label}
-              onPress={() => onChangeOccurredAt(new Date(Date.now() - minutesAgo * 60_000))}
+              onPress={() =>
+                onChangeOccurredAt(
+                  floorToMinute(
+                    minutesAgo === null
+                      ? new Date()
+                      : new Date(occurredAt.getTime() - minutesAgo * 60_000),
+                  ),
+                )
+              }
               accessibilityRole="button"
-              accessibilityLabel={`発生時刻を${label}にする`}
+              accessibilityLabel={
+                minutesAgo === null ? '発生時刻をいまにする' : `発生時刻を${label}にずらす`
+              }
               className="min-h-[44px] justify-center rounded-full bg-surface-selected px-three dark:bg-surface-selected-dark">
               <Text className="text-sm text-fg dark:text-fg-dark">{label}</Text>
             </Pressable>

@@ -1,7 +1,10 @@
 import type { PainLevel } from '@/constants/pain-levels';
 
-/** headache_types のマスタ id。Supabase 側の serial 採番と一致させている */
-export type HeadacheTypeId = 1 | 2 | 3 | 4;
+/**
+ * headache_types のマスタ id。Supabase 側の serial 採番と一致させている。
+ * 3（群発）はマイグレーション 0002 で削除したため欠番。
+ */
+export type HeadacheTypeId = 1 | 2 | 4;
 
 export type HeadacheType = {
   id: HeadacheTypeId;
