@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { HeadacheList } from '@/components/headache-list';
@@ -103,6 +103,22 @@ export default function CalendarScreen() {
             <Text className="text-base font-bold text-fg dark:text-fg-dark">
               {formatFullDate(parseDateKey(selectedDateKey))}
             </Text>
+
+            {/* 発生時刻の上限が「いま」なので、未来日には追加導線を出さない
+                （日付キーは YYYY-MM-DD なので辞書順比較がそのまま日付順になる） */}
+            {selectedDateKey <= todayKey && (
+              <Pressable
+                onPress={() =>
+                  router.push({ pathname: '/headaches/new', params: { date: selectedDateKey } })
+                }
+                accessibilityRole="button"
+                accessibilityLabel={`${formatFullDate(parseDateKey(selectedDateKey))}に記録を追加する`}
+                className="min-h-[44px] items-center justify-center rounded-xl bg-surface-selected dark:bg-surface-selected-dark">
+                <Text className="text-sm font-bold text-fg dark:text-fg-dark">
+                  ＋ この日に記録を追加
+                </Text>
+              </Pressable>
+            )}
             <HeadacheList
               records={selectedRecords}
               types={types}

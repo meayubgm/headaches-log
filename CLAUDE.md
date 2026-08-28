@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ログインなし（ゲスト＝端末単位）でも全機能利用可能、あとからアカウントへ一括紐付け
 - 複数端末競合は Last Write Wins（`updated_at` 比較）で解決
 
-現在の実装状況: Phase 2（カレンダー表示）まで完了。ホーム画面から痛み度合い・頭痛の種類（片頭痛／緊張型／その他）・メモ・発生時刻を記録し、ローカルSQLiteに保存して一覧表示できる。カレンダー画面では月グリッドに痛み度合いの色ドットと件数を表示し、日付を選ぶとその日の記録一覧が出て、項目から詳細画面（編集・論理削除）へ遷移できる。タグ管理・Supabase同期・認証は未実装。
+現在の実装状況: Phase 2（カレンダー表示）まで完了。ホーム画面から痛み度合い・頭痛の種類（片頭痛／緊張型／その他）・メモ・発生時刻を記録し、ローカルSQLiteに保存して一覧表示できる。カレンダー画面では月グリッドに痛み度合いの色ドットと件数を表示し、日付を選ぶとその日の記録一覧が出て、項目から詳細画面（編集・論理削除）へ遷移できる。選択日が今日以前なら「この日に記録を追加」から新規作成画面へ進み、その日を発生時刻の初期値（今日は現在時刻、過去日は12:00）として記録できる。タグ管理・Supabase同期・認証は未実装。
 
 ## 技術スタック
 
@@ -78,7 +78,7 @@ Xcode を更新した直後は iOS プラットフォーム（SDK 実体とシ�
 
 ### ディレクトリ構成
 
-- `src/app/` — Expo Routerの画面（file-basedルーティング）。`tsconfig.json` で `@/*` → `src/*` にエイリアスされている。ルートの `<Stack>` が `(tabs)`（ホーム／カレンダーの2タブ）と `headaches/[id]`（詳細画面。タブの外に置きヘッダー付きでpushする）を持つ。`app.json` の `experiments.typedRoutes` が有効なので、`router.push()` には `{ pathname: '/headaches/[id]', params: { id } }` の形で渡す（テンプレートリテラルは型が通らない）
+- `src/app/` — Expo Routerの画面（file-basedルーティング）。`tsconfig.json` で `@/*` → `src/*` にエイリアスされている。ルートの `<Stack>` が `(tabs)`（ホーム／カレンダーの2タブ）と `headaches/new`（カレンダーから日付を指定して追加する新規作成画面）・`headaches/[id]`（詳細画面）を持つ。後者2つはタブの外に置きヘッダー付きでpushする（静的セグメントの `new` が動的セグメントの `[id]` より優先される）。`app.json` の `experiments.typedRoutes` が有効なので、`router.push()` には `{ pathname: '/headaches/[id]', params: { id } }` の形で渡す（テンプレートリテラルは型が通らない）
 - `src/components/` — UIコンポーネント。`splash-gate.tsx` が `bootstrapDb()` の完了を待ってスプラッシュを閉じる（`SplashScreen.hideAsync()` を呼ぶのはここだけ）
   - 発生時刻の入力は `date-time-field.tsx` →`date-time-wheel.tsx`（月/日/時/分の4列）→`wheel-picker-column.tsx`（ScrollViewベースの1列）の3段構成。**OSのDateTimePickerは使わず iOS/Android/Web で同一実装**にしている（プラットフォームごとに見た目と操作が割れるのを避けるため）。月列は年をまたいで連続し（選択中の年は `formatFullDateTime` の表示テキストで示す）、列の中央をタップするとテンキー入力へ切り替わる。上限（未来）を超える項目は `disabled` にし、確定値は `lib/clamp-date.ts` で丸める
 - `src/constants/design-tokens.json` — 色・スペーシングトークンの**唯一の出所**。`src/constants/theme.ts`（JS側）と `tailwind.config.js`（NativeWind）の両方がこれを読む。tailwind.config.js は素のNodeが読むためTSの theme.ts を require できないので JSON にしている

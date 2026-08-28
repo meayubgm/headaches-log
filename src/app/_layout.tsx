@@ -18,6 +18,10 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           {/* headerBackTitle を指定しないと、iOS の戻るボタンにルートグループ名の「(tabs)」が出る */}
           <Stack.Screen
+            name="headaches/new"
+            options={{ title: '記録を追加', headerBackTitle: '戻る' }}
+          />
+          <Stack.Screen
             name="headaches/[id]"
             options={{ title: '記録の詳細', headerBackTitle: '戻る' }}
           />
