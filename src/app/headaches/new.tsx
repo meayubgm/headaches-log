@@ -12,6 +12,7 @@ import { createHeadache } from '@/lib/db/repositories/headaches';
 import type { HeadacheTypeId } from '@/lib/db/repositories/types';
 import { formatDateKey, parseDateKey } from '@/lib/format-date';
 import { formatError } from '@/lib/format-error';
+import { t } from '@/lib/i18n';
 import { useTodayKey } from '@/lib/today';
 
 /** 過去日に追加するときの既定時刻（正午。0時始まりよりホイールの移動量が小さい） */
@@ -113,7 +114,9 @@ export default function NewHeadacheScreen() {
           className="flex-1"
           contentContainerClassName="w-full max-w-[800px] self-center gap-four p-four">
           <View className="gap-three">
-            <Text className="text-base font-bold text-fg dark:text-fg-dark">痛みの度合い</Text>
+            <Text className="text-base font-bold text-fg dark:text-fg-dark">
+              {t('editor.painLevelTitle')}
+            </Text>
             <PainLevelSelector value={painLevel} onSelect={setPainLevel} />
           </View>
 
@@ -131,7 +134,7 @@ export default function NewHeadacheScreen() {
             onPress={handleSave}
             disabled={saveDisabled}
             accessibilityRole="button"
-            accessibilityLabel="記録する"
+            accessibilityLabel={t('editor.create')}
             accessibilityState={{ disabled: saveDisabled }}
             className={[
               'min-h-[52px] items-center justify-center rounded-xl',
@@ -144,13 +147,13 @@ export default function NewHeadacheScreen() {
                   ? 'text-fg-muted dark:text-fg-muted-dark'
                   : 'text-white dark:text-black',
               ].join(' ')}>
-              記録する
+              {t('editor.create')}
             </Text>
           </Pressable>
 
           {saveError !== null && (
             <Text className="text-sm text-danger dark:text-danger-dark">
-              {`保存に失敗しました: ${saveError}`}
+              {t('errors.saveFailed', { message: saveError })}
             </Text>
           )}
         </ScrollView>

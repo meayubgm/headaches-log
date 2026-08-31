@@ -40,7 +40,7 @@ export async function runMigrations(db: SQLiteDatabase): Promise<void> {
 
     const sql = migrations[migrationKey(entry.idx)];
     if (typeof sql !== 'string') {
-      throw new Error(`マイグレーションSQLが見つかりません: ${entry.tag}`);
+      throw new Error(`Migration SQL not found: ${entry.tag}`);
     }
 
     // drizzle-kit は複数ステートメントを --> statement-breakpoint で区切って出力する

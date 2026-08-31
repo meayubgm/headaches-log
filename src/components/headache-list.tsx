@@ -1,8 +1,10 @@
 import { Pressable, Text, View } from 'react-native';
 
-import { PAIN_LEVEL_LABELS } from '@/constants/pain-levels';
+import { headacheTypeName } from '@/constants/headache-types';
+import { painLevelLabel } from '@/constants/pain-levels';
 import type { HeadacheRecord, HeadacheType } from '@/lib/db/repositories/types';
 import { formatShortDateTime, formatTime } from '@/lib/format-date';
+import { t } from '@/lib/i18n';
 
 import { PainFaceIcon } from './pain-face-icon';
 
@@ -16,13 +18,11 @@ export type HeadacheListProps = {
   timeOnly?: boolean;
 };
 
-const DEFAULT_EMPTY_MESSAGE = 'まだ記録がありません。痛みの度合いを選んで記録してみましょう。';
-
 export function HeadacheList({
   records,
   types,
   onPressRecord,
-  emptyMessage = DEFAULT_EMPTY_MESSAGE,
+  emptyMessage = t('headacheList.empty'),
   timeOnly = false,
 }: HeadacheListProps) {
   if (records.length === 0) {
@@ -33,7 +33,7 @@ export function HeadacheList({
     );
   }
 
-  const typeNameById = new Map(types.map((type) => [type.id, type.name]));
+  const typeNameById = new Map(types.map((type) => [type.id, headacheTypeName(type.code)]));
 
   return (
     <View className="overflow-hidden rounded-2xl bg-surface dark:bg-surface-dark">
@@ -44,6 +44,7 @@ export function HeadacheList({
 
         const occurredAt = new Date(record.occurredAt);
         const timeLabel = timeOnly ? formatTime(occurredAt) : formatShortDateTime(occurredAt);
+        const levelLabel = painLevelLabel(record.painLevel);
 
         const rowClassName = [
           'flex-row items-center gap-three p-three',
@@ -57,12 +58,12 @@ export function HeadacheList({
               <Text className="text-base text-fg dark:text-fg-dark">
                 {timeLabel}
                 <Text className="text-fg-muted dark:text-fg-muted-dark">
-                  {`　${PAIN_LEVEL_LABELS[record.painLevel]}`}
+                  {`${t('headacheList.levelSeparator')}${levelLabel}`}
                 </Text>
               </Text>
               {typeNames.length > 0 && (
                 <Text className="text-sm text-fg-muted dark:text-fg-muted-dark">
-                  {typeNames.join('・')}
+                  {typeNames.join(t('headacheList.typeSeparator'))}
                 </Text>
               )}
               {record.memo ? (
@@ -87,7 +88,10 @@ export function HeadacheList({
             key={record.id}
             onPress={() => onPressRecord(record.id)}
             accessibilityRole="button"
-            accessibilityLabel={`${timeLabel} ${PAIN_LEVEL_LABELS[record.painLevel]} の記録を開く`}
+            accessibilityLabel={t('headacheList.openRecordA11y', {
+              time: timeLabel,
+              level: levelLabel,
+            })}
             className={`${rowClassName} min-h-[44px]`}>
             {content}
           </Pressable>

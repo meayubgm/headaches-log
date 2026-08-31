@@ -31,7 +31,7 @@ export async function initLocalUserId(): Promise<string> {
 /** initLocalUserId() 完了後にのみ使える。リポジトリ層から同期的に参照する */
 export function getLocalUserId(): string {
   if (!cachedUserId) {
-    throw new Error('ローカル user_id が未初期化です。initLocalUserId() を先に実行してください。');
+    throw new Error('Local user_id is not initialized. Call initLocalUserId() first.');
   }
 
   return cachedUserId;

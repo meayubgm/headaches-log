@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { formatFullDateTime } from '@/lib/format-date';
+import { t } from '@/lib/i18n';
 
 import { DateTimeWheel } from './date-time-wheel';
 
@@ -33,10 +34,12 @@ export function DateTimeField({ value, onChange, getMaximumDate }: DateTimeField
         <Pressable
           onPress={() => setPickerVisible((visible) => !visible)}
           accessibilityRole="button"
-          accessibilityLabel={isPickerVisible ? '発生時刻の変更を完了' : '発生時刻を変更'}
+          accessibilityLabel={
+            isPickerVisible ? t('dateTimeField.doneA11y') : t('dateTimeField.changeA11y')
+          }
           className="min-h-[44px] justify-center rounded-full bg-surface px-four dark:bg-surface-dark">
           <Text className="text-sm text-fg dark:text-fg-dark">
-            {isPickerVisible ? '完了' : '変更'}
+            {isPickerVisible ? t('dateTimeField.done') : t('dateTimeField.change')}
           </Text>
         </Pressable>
       </View>

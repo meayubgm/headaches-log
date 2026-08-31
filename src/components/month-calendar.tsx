@@ -1,9 +1,15 @@
 import { Pressable, Text, View } from 'react-native';
 
-import { PAIN_LEVEL_LABELS, type PainLevel } from '@/constants/pain-levels';
+import { painLevelLabel, type PainLevel } from '@/constants/pain-levels';
 import type { DaySummary } from '@/lib/calendar';
 import { buildMonthGrid } from '@/lib/calendar';
-import { WEEKDAY_LABELS, formatDateKey, formatYearMonth } from '@/lib/format-date';
+import {
+  WEEKDAY_LABELS,
+  formatDateKey,
+  formatMonthDay,
+  formatYearMonth,
+} from '@/lib/format-date';
+import { t } from '@/lib/i18n';
 import { useTodayKey } from '@/lib/today';
 
 /**
@@ -79,7 +85,7 @@ export function MonthCalendar({
       <View className="flex-row items-center justify-between">
         <MonthNavButton
           label="‹"
-          accessibilityLabel="前の月へ"
+          accessibilityLabel={t('calendar.prevMonth')}
           disabled={false}
           onPress={() => onChangeMonth(-1)}
         />
@@ -88,7 +94,7 @@ export function MonthCalendar({
         </Text>
         <MonthNavButton
           label="›"
-          accessibilityLabel="次の月へ"
+          accessibilityLabel={t('calendar.nextMonth')}
           disabled={nextDisabled}
           onPress={() => onChangeMonth(1)}
         />
@@ -113,16 +119,22 @@ export function MonthCalendar({
               const inMonth = isSameMonth(day, visibleMonth);
               const selected = dateKey === selectedDateKey;
 
-              const painLabel = summary
-                ? `頭痛${summary.count}件 最大${PAIN_LEVEL_LABELS[summary.maxPainLevel]}`
-                : '記録なし';
+              const summaryLabel = summary
+                ? t('calendar.daySummary', {
+                    count: summary.count,
+                    label: painLevelLabel(summary.maxPainLevel),
+                  })
+                : t('calendar.dayNoRecord');
 
               return (
                 <Pressable
                   key={dateKey}
                   onPress={() => onSelectDate(dateKey)}
                   accessibilityRole="button"
-                  accessibilityLabel={`${day.getMonth() + 1}月${day.getDate()}日 ${painLabel}`}
+                  accessibilityLabel={t('calendar.dayA11y', {
+                    date: formatMonthDay(day),
+                    summary: summaryLabel,
+                  })}
                   accessibilityState={{ selected }}
                   className={[
                     'min-h-[52px] flex-1 items-center justify-center gap-half rounded-xl border-2',

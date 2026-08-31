@@ -10,6 +10,7 @@ import { useHeadachesInRange } from '@/hooks/use-headaches-in-range';
 import { buildMonthGrid, getGridRange, startOfMonth, summarizeByDay } from '@/lib/calendar';
 import { formatDateKey, formatFullDate, parseDateKey } from '@/lib/format-date';
 import { formatError } from '@/lib/format-error';
+import { t } from '@/lib/i18n';
 import { useTodayKey } from '@/lib/today';
 
 export default function CalendarScreen() {
@@ -45,9 +46,9 @@ export default function CalendarScreen() {
 
   // loading と「本当に記録がない」を混同させない
   const emptyListMessage = {
-    loading: '読み込み中…',
-    error: '読み込みに失敗したため表示できません。',
-    ready: 'この日の記録はありません。',
+    loading: t('calendar.emptyLoading'),
+    error: t('calendar.emptyError'),
+    ready: t('calendar.emptyReady'),
   }[rangeState.status];
 
   const changeMonth = (delta: -1 | 1) => {
@@ -80,13 +81,15 @@ export default function CalendarScreen() {
         <ScrollView
           className="flex-1"
           contentContainerClassName="w-full max-w-[800px] self-center gap-four p-four">
-          <Text className="text-2xl font-bold text-fg dark:text-fg-dark">カレンダー</Text>
+          <Text className="text-2xl font-bold text-fg dark:text-fg-dark">
+            {t('calendar.title')}
+          </Text>
 
           {/* 読み込みに失敗するとドットが1つも出ないため、「記録なし」と誤読されないよう
               グリッドより先にエラーを出す */}
           {rangeState.status === 'error' && (
             <Text className="text-sm text-danger dark:text-danger-dark">
-              {`記録の読み込みに失敗しました: ${formatError(rangeState.error)}`}
+              {t('errors.loadFailed', { message: formatError(rangeState.error) })}
             </Text>
           )}
 
@@ -112,10 +115,12 @@ export default function CalendarScreen() {
                   router.push({ pathname: '/headaches/new', params: { date: selectedDateKey } })
                 }
                 accessibilityRole="button"
-                accessibilityLabel={`${formatFullDate(parseDateKey(selectedDateKey))}に記録を追加する`}
+                accessibilityLabel={t('calendar.addRecordA11y', {
+                  date: formatFullDate(parseDateKey(selectedDateKey)),
+                })}
                 className="min-h-[44px] items-center justify-center rounded-xl bg-surface-selected dark:bg-surface-selected-dark">
                 <Text className="text-sm font-bold text-fg dark:text-fg-dark">
-                  ＋ この日に記録を追加
+                  {t('calendar.addRecord')}
                 </Text>
               </Pressable>
             )}

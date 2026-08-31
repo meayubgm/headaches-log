@@ -10,6 +10,8 @@ import {
   type NativeSyntheticEvent,
 } from 'react-native';
 
+import { t } from '@/lib/i18n';
+
 /** 1行の高さ。中央ハイライト帯（date-time-wheel）と揃える必要がある */
 export const ITEM_HEIGHT = 40;
 /** 可視行数（中央 ±2） */
@@ -268,7 +270,7 @@ export function WheelPickerColumn({
             maxLength={maxLength}
             // iOS の number-pad には確定キーがないため、確定は onBlur が担う
             keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
-            accessibilityLabel={`${label}を入力`}
+            accessibilityLabel={t('dateTimeWheel.inputA11y', { label })}
             className="h-full w-full rounded-lg bg-bg text-center text-lg font-bold text-fg dark:bg-bg-dark dark:text-fg-dark"
           />
         </View>

@@ -3,6 +3,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from 'react-native';
 
 import { SplashGate } from '@/components/splash-gate';
+import { t } from '@/lib/i18n';
 
 import '@/global.css';
 
@@ -19,11 +20,11 @@ export default function RootLayout() {
           {/* headerBackTitle を指定しないと、iOS の戻るボタンにルートグループ名の「(tabs)」が出る */}
           <Stack.Screen
             name="headaches/new"
-            options={{ title: '記録を追加', headerBackTitle: '戻る' }}
+            options={{ title: t('navigation.newHeadache'), headerBackTitle: t('navigation.back') }}
           />
           <Stack.Screen
             name="headaches/[id]"
-            options={{ title: '記録の詳細', headerBackTitle: '戻る' }}
+            options={{ title: t('navigation.headacheDetail'), headerBackTitle: t('navigation.back') }}
           />
         </Stack>
       </SplashGate>

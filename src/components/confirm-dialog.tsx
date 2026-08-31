@@ -1,5 +1,7 @@
 import { Modal, Pressable, Text, View } from 'react-native';
 
+import { t } from '@/lib/i18n';
+
 /**
  * 確認ダイアログ。react-native の `Alert` は react-native-web で機能しないため、
  * 3プラットフォーム共通で動くよう `Modal` で自前実装している。
@@ -21,7 +23,7 @@ export function ConfirmDialog({
   title,
   message,
   confirmLabel,
-  cancelLabel = 'キャンセル',
+  cancelLabel = t('confirmDialog.cancel'),
   destructive = false,
   onConfirm,
   onCancel,

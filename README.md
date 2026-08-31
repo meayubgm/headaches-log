@@ -2,16 +2,18 @@
 
 無料・シンプル・サクサク動く頭痛記録アプリ。「ワンタップで記録できる手軽さ」と「通院時に医師へ見せられるデータ精度」の両立をコンセプトにしています。
 
+- 日本語・英語対応（端末の言語に追従。それ以外の言語では英語で表示）
 - オフライン時も含めて全機能が使えるオフラインファースト構成
 - ログインなし（ゲスト）でも全機能が使え、あとからアカウントに紐付け可能
 - 詳しい要件定義は `docs/頭痛ログ_要件定義.md` を参照（Git管理外）
 
-> 現在の実装状況: カレンダー表示（Phase 2）まで完了。ホーム画面から痛みの度合い・頭痛の種類・メモ・発生時刻を記録でき、カレンダー画面では月ごとの分布（痛み度合いの色ドット＋件数）と日別の記録一覧を確認できます。カレンダーで日付を選ぶと「この日に記録を追加」からその日の記録を作成でき、記録をタップすると詳細画面で編集・削除ができます。ここまでオフラインのまま動作します。タグ管理・クラウド同期・認証は未実装です。
+> 現在の実装状況: カレンダー表示（Phase 2）まで完了。ホーム画面から痛みの度合い・頭痛の種類・メモ・発生時刻を記録でき、カレンダー画面では月ごとの分布（痛み度合いの色ドット＋件数）と日別の記録一覧を確認できます。カレンダーで日付を選ぶと「この日に記録を追加」からその日の記録を作成でき、記録をタップすると詳細画面で編集・削除ができます。ここまでオフラインのまま動作します。表示言語は端末の設定に追従します（日本語／英語）。タグ管理・クラウド同期・認証は未実装です。
 
 ## 技術スタック
 
 - [Expo](https://expo.dev) SDK 57 + [Expo Router](https://docs.expo.dev/router/introduction/)（TypeScript strict）
 - スタイリング: [NativeWind](https://www.nativewind.dev/)（Tailwind CSS for React Native）
+- 多言語化: [expo-localization](https://docs.expo.dev/versions/latest/sdk/localization/) + [i18n-js](https://github.com/fnando/i18n)（辞書は `src/lib/i18n/locales/`）
 - ローカルDB: [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/)（オフラインファーストの正データ）。[drizzle-orm](https://orm.drizzle.team/) はスキーマ定義とマイグレーションSQLの生成に使用
 - バックエンド: [Supabase](https://supabase.com/)（Postgres, Auth, Row Level Security）
 
@@ -102,15 +104,16 @@ AVD を変えるときは `make up-emu AVD=<名前>`、実機に入れるとき�
 その他の主なコマンド:
 
 ```bash
-make down-web    # up-webで起動したWebコンテナの停止
-make up-db       # Supabaseローカル環境の起動
-make down-db     # Supabaseローカル環境の停止
-make migrate-db  # Postgres側マイグレーション適用（supabase db push）
-make lint        # ESLint
-make typecheck   # 型チェック（tsc --noEmit）
+make down-web          # up-webで起動したWebコンテナの停止
+make up-db             # Supabaseローカル環境の起動
+make down-db           # Supabaseローカル環境の停止
+make migrate-db-local  # Postgres側マイグレーションをローカル環境へ適用
+make migrate-db        # Postgres側マイグレーションをリンク済みリモートへ適用
+make lint              # ESLint
+make typecheck         # 型チェック（tsc --noEmit）
 ```
 
-ローカルDBのスキーマ（`src/lib/db/schema.ts`）を変更した場合は、`npx drizzle-kit generate` でマイグレーションを生成してください。データ投入など手書きのSQLが必要なときは `npx drizzle-kit generate --custom --name=<name>` を使います。Supabase側のスキーマ・RLSポリシーは `supabase/migrations/` に追加します。
+ローカルDBのスキーマ（`src/lib/db/schema.ts`）を変更した場合は、`npx drizzle-kit generate` でマイグレーションを生成してください。データ投入など手書きのSQLが必要なときは `npx drizzle-kit generate --custom --name=<name>` を使います（列のリネームは drizzle-kit が対話プロンプトを出すため、非対話のシェルからは実行できません。詳細は [`CLAUDE.md`](./CLAUDE.md)）。Supabase側のスキーマ・RLSポリシーは `supabase/migrations/` に追加し、ローカル環境へは `make migrate-db-local` で適用します。`make migrate-db`（`supabase db push`）はリンク済みのリモートプロジェクト向けで、ローカルには効きません。
 
 なお、アプリからのDBアクセスは drizzle のクエリビルダではなく `src/lib/db/repositories/` の生SQL（expo-sqlite の非同期API）で行います。理由は [`CLAUDE.md`](./CLAUDE.md) の「ローカルDBアクセス方針」を参照してください。
 

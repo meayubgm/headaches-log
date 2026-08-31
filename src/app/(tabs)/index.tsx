@@ -14,6 +14,7 @@ import { createHeadache } from '@/lib/db/repositories/headaches';
 import type { HeadacheTypeId } from '@/lib/db/repositories/types';
 import { formatFullDate, parseDateKey } from '@/lib/format-date';
 import { formatError } from '@/lib/format-error';
+import { t } from '@/lib/i18n';
 import { useTodayKey } from '@/lib/today';
 
 export default function HomeScreen() {
@@ -72,7 +73,7 @@ export default function HomeScreen() {
       setOccurredAt(null);
       setMemo('');
       setDetailOpen(false);
-      setToast((prev) => ({ id: (prev?.id ?? 0) + 1, message: '記録しました' }));
+      setToast((prev) => ({ id: (prev?.id ?? 0) + 1, message: t('home.saved') }));
     } catch (error) {
       setSaveError(formatError(error));
     } finally {
@@ -87,14 +88,16 @@ export default function HomeScreen() {
           className="flex-1"
           contentContainerClassName="w-full max-w-[800px] self-center gap-four p-four">
           <View className="gap-half">
-            <Text className="text-2xl font-bold text-fg dark:text-fg-dark">頭痛ログ</Text>
+            <Text className="text-2xl font-bold text-fg dark:text-fg-dark">{t('app.title')}</Text>
             <Text className="text-sm text-fg-muted dark:text-fg-muted-dark">
               {formatFullDate(parseDateKey(todayKey))}
             </Text>
           </View>
 
           <View className="gap-three">
-            <Text className="text-base font-bold text-fg dark:text-fg-dark">いまの痛みは？</Text>
+            <Text className="text-base font-bold text-fg dark:text-fg-dark">
+              {t('home.painQuestion')}
+            </Text>
             <PainLevelSelector value={painLevel} onSelect={setPainLevel} />
           </View>
 
@@ -116,7 +119,7 @@ export default function HomeScreen() {
             onPress={handleSave}
             disabled={painLevel === null || saving}
             accessibilityRole="button"
-            accessibilityLabel="記録する"
+            accessibilityLabel={t('home.save')}
             accessibilityState={{ disabled: painLevel === null || saving }}
             className={[
               'min-h-[52px] items-center justify-center rounded-xl',
@@ -131,7 +134,7 @@ export default function HomeScreen() {
                   ? 'text-fg-muted dark:text-fg-muted-dark'
                   : 'text-white dark:text-black',
               ].join(' ')}>
-              記録する
+              {t('home.save')}
             </Text>
           </Pressable>
 
@@ -139,15 +142,17 @@ export default function HomeScreen() {
 
           {saveError !== null && (
             <Text className="text-sm text-danger dark:text-danger-dark">
-              {`保存に失敗しました: ${saveError}`}
+              {t('errors.saveFailed', { message: saveError })}
             </Text>
           )}
 
           <View className="gap-three">
-            <Text className="text-base font-bold text-fg dark:text-fg-dark">最近の記録</Text>
+            <Text className="text-base font-bold text-fg dark:text-fg-dark">
+              {t('home.recentTitle')}
+            </Text>
             {recentState.status === 'error' ? (
               <Text className="text-sm text-danger dark:text-danger-dark">
-                {`記録の読み込みに失敗しました: ${formatError(recentState.error)}`}
+                {t('errors.loadFailed', { message: formatError(recentState.error) })}
               </Text>
             ) : (
               <HeadacheList records={records} types={types} />

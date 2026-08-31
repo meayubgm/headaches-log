@@ -11,9 +11,11 @@ import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 // - deletedAt: 論理削除（同期用トンビストーン）。物理削除はしない
 // - updatedAt: LWW（Last Write Wins）競合解決の比較に使う
 
+// 表示名は端末の言語で切り替えるため、DB には言語非依存のコード
+// （migraine / tension / other）だけを持たせ、和訳・英訳は src/lib/i18n が持つ。
 export const headacheTypes = sqliteTable('headache_types', {
   id: integer('id').primaryKey(),
-  name: text('name').notNull().unique(),
+  code: text('code').notNull().unique(),
 });
 
 export const headaches = sqliteTable('headaches', {

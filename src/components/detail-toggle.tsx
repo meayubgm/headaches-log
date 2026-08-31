@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, Platform, Pressable, Text } from 'react-native';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { t } from '@/lib/i18n';
 
 export type DetailToggleProps = {
   open: boolean;
@@ -64,7 +65,7 @@ export function DetailToggle({ open, onPress }: DetailToggleProps) {
       accessibilityState={{ expanded: open }}
       className="min-h-[44px] flex-row items-center justify-between rounded-xl bg-surface px-four dark:bg-surface-dark">
       <Text className="text-sm text-fg dark:text-fg-dark">
-        {open ? '詳細を閉じる' : '詳細を入力（任意）'}
+        {open ? t('detailToggle.close') : t('detailToggle.open')}
       </Text>
       <Animated.View style={{ transform: [{ rotate }] }}>
         <FontAwesome6 name="angle-down" solid size={16} color={iconColor} />

@@ -1,6 +1,8 @@
 import { Pressable, Text, View } from 'react-native';
 
+import { headacheTypeName } from '@/constants/headache-types';
 import type { HeadacheType, HeadacheTypeId } from '@/lib/db/repositories/types';
+import { t } from '@/lib/i18n';
 
 export type HeadacheTypeChipsProps = {
   types: HeadacheType[];
@@ -14,13 +16,14 @@ export function HeadacheTypeChips({ types, selectedIds, onToggle }: HeadacheType
     <View className="flex-row flex-wrap gap-two">
       {types.map((type) => {
         const selected = selectedIds.includes(type.id);
+        const name = headacheTypeName(type.code);
 
         return (
           <Pressable
             key={type.id}
             onPress={() => onToggle(type.id)}
             accessibilityRole="button"
-            accessibilityLabel={`頭痛の種類 ${type.name}`}
+            accessibilityLabel={t('detailForm.typeChipA11y', { name })}
             accessibilityState={{ selected }}
             className={[
               'min-h-[44px] justify-center rounded-full border px-four',
@@ -33,7 +36,7 @@ export function HeadacheTypeChips({ types, selectedIds, onToggle }: HeadacheType
                 'text-sm',
                 selected ? 'font-bold text-white dark:text-black' : 'text-fg dark:text-fg-dark',
               ].join(' ')}>
-              {type.name}
+              {name}
             </Text>
           </Pressable>
         );

@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 
 import { clampToMaximum, daysInMonth, floorToMinute } from '@/lib/clamp-date';
+import { t } from '@/lib/i18n';
 
 import {
   ITEM_HEIGHT,
@@ -53,6 +54,14 @@ function isOverMaximum(date: Date, maximumDate?: Date): boolean {
 export function DateTimeWheel({ value, onChange, getMaximumDate }: DateTimeWheelProps) {
   const maximumDate = getMaximumDate?.();
 
+  // ヘッダーと各列の読み上げラベルで同じ文言を使う
+  const columnLabels = {
+    month: t('dateTimeWheel.month'),
+    day: t('dateTimeWheel.day'),
+    hour: t('dateTimeWheel.hour'),
+    minute: t('dateTimeWheel.minute'),
+  };
+
   const currentYearMonth = toYearMonth(value);
   const day = value.getDate();
   const hour = value.getHours();
@@ -72,7 +81,7 @@ export function DateTimeWheel({ value, onChange, getMaximumDate }: DateTimeWheel
   for (let yearMonth = lowerYearMonth; yearMonth <= upperYearMonth; yearMonth += 1) {
     monthItems.push({
       value: yearMonth,
-      text: `${month0Of(yearMonth) + 1}月`,
+      text: t('dateTimeWheel.monthItem', { month: month0Of(yearMonth) + 1 }),
       // その月の最も早い日時（1日 0:00）でも上限を超えるなら選べない
       disabled: isOverMaximum(new Date(yearOf(yearMonth), month0Of(yearMonth), 1), maximumDate),
     });
@@ -154,13 +163,15 @@ export function DateTimeWheel({ value, onChange, getMaximumDate }: DateTimeWheel
   return (
     <View className="gap-one rounded-xl bg-bg p-two dark:bg-bg-dark">
       <View className="flex-row">
-        {['月', '日', '時', '分'].map((header) => (
-          <Text
-            key={header}
-            className="flex-1 text-center text-xs text-fg-muted dark:text-fg-muted-dark">
-            {header}
-          </Text>
-        ))}
+        {[columnLabels.month, columnLabels.day, columnLabels.hour, columnLabels.minute].map(
+          (header) => (
+            <Text
+              key={header}
+              className="flex-1 text-center text-xs text-fg-muted dark:text-fg-muted-dark">
+              {header}
+            </Text>
+          ),
+        )}
       </View>
 
       <View style={{ height: WHEEL_HEIGHT }}>
@@ -171,7 +182,7 @@ export function DateTimeWheel({ value, onChange, getMaximumDate }: DateTimeWheel
 
         <View className="flex-row">
           <WheelPickerColumn
-            label="月"
+            label={columnLabels.month}
             items={monthItems}
             value={currentYearMonth}
             onChange={(yearMonth) => commit({ yearMonth })}
@@ -179,7 +190,7 @@ export function DateTimeWheel({ value, onChange, getMaximumDate }: DateTimeWheel
             inputValue={month0 + 1}
           />
           <WheelPickerColumn
-            label="日"
+            label={columnLabels.day}
             items={dayItems}
             value={day}
             onChange={(nextDay) => commit({ day: nextDay })}
@@ -187,7 +198,7 @@ export function DateTimeWheel({ value, onChange, getMaximumDate }: DateTimeWheel
             inputValue={day}
           />
           <WheelPickerColumn
-            label="時"
+            label={columnLabels.hour}
             items={hourItems}
             value={hour}
             onChange={(nextHour) => commit({ hour: nextHour })}
@@ -195,7 +206,7 @@ export function DateTimeWheel({ value, onChange, getMaximumDate }: DateTimeWheel
             inputValue={hour}
           />
           <WheelPickerColumn
-            label="分"
+            label={columnLabels.minute}
             items={minuteItems}
             value={minute}
             onChange={(nextMinute) => commit({ minute: nextMinute })}

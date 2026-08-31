@@ -1,6 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
 
-import { PAIN_LEVEL_LABELS, PAIN_LEVELS, type PainLevel } from '@/constants/pain-levels';
+import { PAIN_LEVELS, painLevelLabel, type PainLevel } from '@/constants/pain-levels';
+import { t } from '@/lib/i18n';
 
 import { PainFaceIcon } from './pain-face-icon';
 
@@ -15,13 +16,14 @@ export function PainLevelSelector({ value, onSelect }: PainLevelSelectorProps) {
     <View className="flex-row gap-two">
       {PAIN_LEVELS.map((level) => {
         const selected = value === level;
+        const label = painLevelLabel(level);
 
         return (
           <Pressable
             key={level}
             onPress={() => onSelect(level)}
             accessibilityRole="button"
-            accessibilityLabel={`痛みの度合い ${level}: ${PAIN_LEVEL_LABELS[level]}`}
+            accessibilityLabel={t('painLevelSelector.a11y', { level, label })}
             accessibilityState={{ selected }}
             className={[
               'flex-1 items-center gap-two rounded-2xl border-2 py-three',
@@ -37,7 +39,7 @@ export function PainLevelSelector({ value, onSelect }: PainLevelSelectorProps) {
                   ? 'font-bold text-fg dark:text-fg-dark'
                   : 'text-fg-muted dark:text-fg-muted-dark',
               ].join(' ')}>
-              {PAIN_LEVEL_LABELS[level]}
+              {label}
             </Text>
           </Pressable>
         );

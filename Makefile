@@ -1,4 +1,4 @@
-.PHONY: setup up-web down-web run-android run-ios up-emu up-native reconnect-native down-native up-db down-db migrate-db studio-db lint typecheck test
+.PHONY: setup up-web down-web run-android run-ios up-emu up-native reconnect-native down-native up-db down-db migrate-db-local migrate-db studio-db lint typecheck test
 
 # ネイティブ開発用の設定（環境に合わせて上書き可能）
 ANDROID_HOME ?= $(HOME)/Library/Android/sdk
@@ -81,7 +81,13 @@ up-db:
 down-db:
 	npx supabase stop
 
-# Postgres側マイグレーション適用（ローカルSQLite側はアプリ起動時に自動実行）
+# Postgres側マイグレーションをローカル環境へ適用（未適用のものだけを非破壊で流す）。
+# supabase start は既存ボリュームから復元するだけなので、あとから追加した分は自動では流れない。
+# ローカルSQLite側はアプリ起動時に自前ランナーが適用する。
+migrate-db-local:
+	npx supabase migration up --local
+
+# Postgres側マイグレーションをリンク済みのリモートプロジェクトへ適用
 migrate-db:
 	npx supabase db push
 

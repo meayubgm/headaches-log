@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 
 import { bootstrapDb } from '@/lib/db/bootstrap';
+import { t } from '@/lib/i18n';
 
 /**
  * ローカルDBの初期化 → マイグレーション → 端末ローカル user_id の初期化を待ってから
@@ -47,7 +48,7 @@ export function SplashGate({ children }: { children: ReactNode }) {
         className="flex-1 bg-bg dark:bg-bg-dark"
         contentContainerClassName="flex-1 items-center justify-center gap-four p-four">
         <Text className="text-lg font-bold text-fg dark:text-fg-dark">
-          データベースの初期化に失敗しました
+          {t('errors.dbInitFailed')}
         </Text>
         <Text className="text-sm text-fg-muted dark:text-fg-muted-dark">
           {failure instanceof Error ? failure.message : String(failure)}

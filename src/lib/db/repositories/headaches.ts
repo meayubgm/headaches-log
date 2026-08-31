@@ -3,6 +3,7 @@ import * as Crypto from 'expo-crypto';
 import { isPainLevel, type PainLevel } from '@/constants/pain-levels';
 
 import { getDb } from '../client';
+import { HeadacheNotFoundError } from './errors';
 import { bumpDbRevision } from '../db-revision';
 import { getLocalUserId } from './local-user';
 import type {
@@ -25,7 +26,7 @@ const DEFAULT_LIST_LIMIT = 20;
 
 function toPainLevel(value: number): PainLevel {
   if (!isPainLevel(value)) {
-    throw new Error(`不正な pain_level です: ${value}`);
+    throw new Error(`Invalid pain_level: ${value}`);
   }
 
   return value;
@@ -227,7 +228,7 @@ export async function updateHeadache(
     // ここで throw すると withTransactionAsync がロールバックするので、
     // 中間テーブルだけが書き換わることもない。
     if (result.changes === 0) {
-      throw new Error(`更新対象の記録が見つかりません: ${id}`);
+      throw new HeadacheNotFoundError(id);
     }
 
     if (input.typeIds !== undefined) {
@@ -239,7 +240,7 @@ export async function updateHeadache(
 
   const updated = await getHeadache(id);
   if (!updated) {
-    throw new Error(`更新対象の記録が見つかりません: ${id}`);
+    throw new HeadacheNotFoundError(id);
   }
 
   return updated;
@@ -259,7 +260,7 @@ export async function softDeleteHeadache(id: string): Promise<void> {
   );
 
   if (result.changes === 0) {
-    throw new Error(`削除対象の記録が見つかりません: ${id}`);
+    throw new HeadacheNotFoundError(id);
   }
 
   bumpDbRevision();

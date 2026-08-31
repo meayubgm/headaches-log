@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { t } from '@/lib/i18n';
 
 export default function TabsLayout() {
   const scheme = useColorScheme();
@@ -24,7 +25,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'ホーム',
+          title: t('tabs.home'),
           tabBarIcon: ({ color, size }) => (
             <FontAwesome6 name="house" solid size={size} color={color} />
           ),
@@ -33,7 +34,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="calendar"
         options={{
-          title: 'カレンダー',
+          title: t('tabs.calendar'),
           tabBarIcon: ({ color, size }) => (
             <FontAwesome6 name="calendar-days" solid size={size} color={color} />
           ),

@@ -1,0 +1,106 @@
+import type { Translations } from './ja';
+
+export const en: Translations = {
+  app: {
+    title: 'Headache Log',
+  },
+  tabs: {
+    home: 'Home',
+    calendar: 'Calendar',
+  },
+  navigation: {
+    back: 'Back',
+    newHeadache: 'Add record',
+    headacheDetail: 'Record details',
+  },
+  painLevels: {
+    mild: 'Mild',
+    painful: 'Painful',
+    severe: 'Very painful',
+    unbearable: 'Unbearable',
+  },
+  headacheTypes: {
+    migraine: 'Migraine',
+    tension: 'Tension',
+    other: 'Other',
+  },
+  home: {
+    painQuestion: 'How bad is it right now?',
+    save: 'Save record',
+    saved: 'Saved',
+    recentTitle: 'Recent records',
+  },
+  editor: {
+    painLevelTitle: 'Pain level',
+    create: 'Save record',
+    update: 'Save changes',
+    updated: 'Saved',
+    delete: 'Delete this record',
+    deleteA11y: 'Delete this record',
+    deleteConfirmTitle: 'Delete this record?',
+    deleteConfirmMessage: 'This cannot be undone.',
+    deleteConfirmLabel: 'Delete',
+    notFound: 'Record not found. It may have been deleted.',
+  },
+  detailForm: {
+    typesTitle: 'Headache type (choose any)',
+    typeChipA11y: 'Headache type %{name}',
+    occurredAtTitle: 'Time of onset',
+    memoTitle: 'Notes',
+    memoPlaceholder: 'Anything you noticed',
+    shortcutNow: 'Now',
+    shortcutMinutesAgo: '%{minutes} min earlier',
+    shortcutHoursAgo: '%{hours} hr earlier',
+    shortcutNowA11y: 'Set the time of onset to now',
+    shortcutShiftA11y: 'Shift the time of onset %{label}',
+  },
+  dateTimeField: {
+    change: 'Change',
+    done: 'Done',
+    changeA11y: 'Change the time of onset',
+    doneA11y: 'Finish changing the time of onset',
+  },
+  dateTimeWheel: {
+    month: 'Month',
+    day: 'Day',
+    hour: 'Hour',
+    minute: 'Min',
+    monthItem: '%{month}',
+    inputA11y: 'Enter %{label}',
+  },
+  detailToggle: {
+    open: 'Add details (optional)',
+    close: 'Hide details',
+  },
+  calendar: {
+    title: 'Calendar',
+    prevMonth: 'Previous month',
+    nextMonth: 'Next month',
+    addRecord: '+ Add a record for this day',
+    addRecordA11y: 'Add a record for %{date}',
+    dayA11y: '%{date}, %{summary}',
+    daySummary: '%{count} headache(s), worst %{label}',
+    dayNoRecord: 'No records',
+    emptyLoading: 'Loading…',
+    emptyError: 'Cannot show records because loading failed.',
+    emptyReady: 'No records for this day.',
+  },
+  headacheList: {
+    empty: 'No records yet. Pick a pain level to save your first one.',
+    typeSeparator: ', ',
+    levelSeparator: ' · ',
+    openRecordA11y: 'Open the %{time} %{level} record',
+  },
+  painLevelSelector: {
+    a11y: 'Pain level %{level}: %{label}',
+  },
+  confirmDialog: {
+    cancel: 'Cancel',
+  },
+  errors: {
+    saveFailed: 'Could not save: %{message}',
+    headacheNotFound: 'This record was not found. It may have been deleted on another device.',
+    loadFailed: 'Could not load records: %{message}',
+    dbInitFailed: 'Could not initialize the database',
+  },
+};

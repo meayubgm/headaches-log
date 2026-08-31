@@ -13,6 +13,7 @@ import { useHeadacheTypes } from '@/hooks/use-headache-types';
 import { softDeleteHeadache, updateHeadache } from '@/lib/db/repositories/headaches';
 import type { HeadacheRecord, HeadacheType, HeadacheTypeId } from '@/lib/db/repositories/types';
 import { formatError } from '@/lib/format-error';
+import { t } from '@/lib/i18n';
 
 type FormState = {
   painLevel: PainLevel;
@@ -90,7 +91,7 @@ function HeadacheEditor({ record, types }: { record: HeadacheRecord; types: Head
         typeIds: form.typeIds,
       });
 
-      setToast((prev) => ({ id: (prev?.id ?? 0) + 1, message: '保存しました' }));
+      setToast((prev) => ({ id: (prev?.id ?? 0) + 1, message: t('editor.updated') }));
     } catch (error) {
       setActionError(formatError(error));
     } finally {
@@ -126,7 +127,9 @@ function HeadacheEditor({ record, types }: { record: HeadacheRecord; types: Head
           className="flex-1"
           contentContainerClassName="w-full max-w-[800px] self-center gap-four p-four">
           <View className="gap-three">
-            <Text className="text-base font-bold text-fg dark:text-fg-dark">痛みの度合い</Text>
+            <Text className="text-base font-bold text-fg dark:text-fg-dark">
+              {t('editor.painLevelTitle')}
+            </Text>
             <PainLevelSelector
               value={form.painLevel}
               onSelect={(painLevel) => setForm((current) => ({ ...current, painLevel }))}
@@ -147,7 +150,7 @@ function HeadacheEditor({ record, types }: { record: HeadacheRecord; types: Head
             onPress={handleSave}
             disabled={saveDisabled}
             accessibilityRole="button"
-            accessibilityLabel="保存する"
+            accessibilityLabel={t('editor.update')}
             accessibilityState={{ disabled: saveDisabled }}
             className={[
               'min-h-[52px] items-center justify-center rounded-xl',
@@ -160,7 +163,7 @@ function HeadacheEditor({ record, types }: { record: HeadacheRecord; types: Head
                   ? 'text-fg-muted dark:text-fg-muted-dark'
                   : 'text-white dark:text-black',
               ].join(' ')}>
-              保存する
+              {t('editor.update')}
             </Text>
           </Pressable>
 
@@ -173,18 +176,20 @@ function HeadacheEditor({ record, types }: { record: HeadacheRecord; types: Head
           <Pressable
             onPress={() => setConfirmingDelete(true)}
             accessibilityRole="button"
-            accessibilityLabel="この記録を削除する"
+            accessibilityLabel={t('editor.deleteA11y')}
             className="min-h-[44px] items-center justify-center rounded-xl">
-            <Text className="text-base text-danger dark:text-danger-dark">この記録を削除</Text>
+            <Text className="text-base text-danger dark:text-danger-dark">
+              {t('editor.delete')}
+            </Text>
           </Pressable>
         </ScrollView>
       </SafeAreaView>
 
       <ConfirmDialog
         visible={confirmingDelete}
-        title="記録を削除しますか？"
-        message="この操作は取り消せません。"
-        confirmLabel="削除する"
+        title={t('editor.deleteConfirmTitle')}
+        message={t('editor.deleteConfirmMessage')}
+        confirmLabel={t('editor.deleteConfirmLabel')}
         destructive
         onConfirm={handleDelete}
         onCancel={() => setConfirmingDelete(false)}
@@ -208,11 +213,13 @@ export default function HeadacheDetailScreen() {
   }
 
   if (recordState.status === 'error') {
-    return <Message>{`記録の読み込みに失敗しました: ${formatError(recordState.error)}`}</Message>;
+    return (
+      <Message>{t('errors.loadFailed', { message: formatError(recordState.error) })}</Message>
+    );
   }
 
   if (recordState.data === null) {
-    return <Message>記録が見つかりません。削除された可能性があります。</Message>;
+    return <Message>{t('editor.notFound')}</Message>;
   }
 
   return (

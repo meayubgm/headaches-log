@@ -1,3 +1,4 @@
+import type { HeadacheTypeCode } from '@/constants/headache-types';
 import type { PainLevel } from '@/constants/pain-levels';
 
 /**
@@ -6,9 +7,10 @@ import type { PainLevel } from '@/constants/pain-levels';
  */
 export type HeadacheTypeId = 1 | 2 | 4;
 
+/** 表示名は持たない。`headacheTypeName(code)` で端末の言語に応じて解決する */
 export type HeadacheType = {
   id: HeadacheTypeId;
-  name: string;
+  code: HeadacheTypeCode;
 };
 
 /**

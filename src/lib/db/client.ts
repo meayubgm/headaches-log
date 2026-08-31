@@ -42,7 +42,7 @@ export async function initDb(): Promise<SQLiteDatabase> {
 
 export function getDb(): SQLiteDatabase {
   if (!dbInstance) {
-    throw new Error('ローカルDBが未初期化です。initDb() を先に実行してください。');
+    throw new Error('Local database is not initialized. Call initDb() first.');
   }
 
   return dbInstance;
