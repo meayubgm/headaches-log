@@ -7,6 +7,8 @@ import { HeadacheDetailForm } from '@/components/headache-detail-form';
 import { PainLevelSelector } from '@/components/pain-level-selector';
 import type { PainLevel } from '@/constants/pain-levels';
 import { useHeadacheTypes } from '@/hooks/use-headache-types';
+import { useTagSelection } from '@/hooks/use-tag-selection';
+import { useTags } from '@/hooks/use-tags';
 import { clampToMaximum, floorToMinute } from '@/lib/clamp-date';
 import { createHeadache } from '@/lib/db/repositories/headaches';
 import type { HeadacheTypeId } from '@/lib/db/repositories/types';
@@ -62,6 +64,9 @@ export default function NewHeadacheScreen() {
 
   const typesState = useHeadacheTypes();
   const types = typesState.status === 'ready' ? typesState.data : [];
+  const tagsState = useTags();
+  const tags = tagsState.status === 'ready' ? tagsState.data : [];
+  const { selectedTagIds, toggleTag, createAndSelectTag } = useTagSelection();
 
   const [painLevel, setPainLevel] = useState<PainLevel | null>(null);
   const [selectedTypeIds, setSelectedTypeIds] = useState<HeadacheTypeId[]>([]);
@@ -93,6 +98,7 @@ export default function NewHeadacheScreen() {
         occurredAt: occurredAt.toISOString(),
         memo: memo.trim() === '' ? null : memo.trim(),
         typeIds: selectedTypeIds,
+        tagIds: selectedTagIds,
       });
 
       // Web でこの URL を直接開いた場合は戻り先の履歴がないため、カレンダーへ置き換える
@@ -128,6 +134,10 @@ export default function NewHeadacheScreen() {
             onChangeOccurredAt={setOccurredAt}
             memo={memo}
             onChangeMemo={setMemo}
+            tags={tags}
+            selectedTagIds={selectedTagIds}
+            onToggleTag={toggleTag}
+            onCreateTag={createAndSelectTag}
           />
 
           <Pressable

@@ -1,11 +1,13 @@
 import { Pressable, Text, TextInput, View } from 'react-native';
 
+import type { TagType } from '@/constants/tag-types';
 import { floorToMinute } from '@/lib/clamp-date';
-import type { HeadacheType, HeadacheTypeId } from '@/lib/db/repositories/types';
+import type { HeadacheType, HeadacheTypeId, TagRecord } from '@/lib/db/repositories/types';
 import { t } from '@/lib/i18n';
 
 import { DateTimeField } from './date-time-field';
 import { HeadacheTypeChips } from './headache-type-chips';
+import { TagChips } from './tag-chips';
 
 /**
  * 発生時刻のクイック指定。minutesAgo が null なら現在時刻へ、
@@ -38,6 +40,11 @@ export type HeadacheDetailFormProps = {
   onChangeOccurredAt: (next: Date) => void;
   memo: string;
   onChangeMemo: (next: string) => void;
+  /** 生存タグ全件。区分ごとの振り分けはこのコンポーネントが行う */
+  tags: TagRecord[];
+  selectedTagIds: string[];
+  onToggleTag: (id: string) => void;
+  onCreateTag: (name: string, type: TagType) => Promise<void>;
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -57,11 +64,38 @@ export function HeadacheDetailForm({
   onChangeOccurredAt,
   memo,
   onChangeMemo,
+  tags,
+  selectedTagIds,
+  onToggleTag,
+  onCreateTag,
 }: HeadacheDetailFormProps) {
+  const causeTags = tags.filter((tag) => tag.type === 'cause');
+  const medicationTags = tags.filter((tag) => tag.type === 'medication');
+
   return (
     <View className="gap-four rounded-2xl bg-surface p-four dark:bg-surface-dark">
       <Section title={t('detailForm.typesTitle')}>
         <HeadacheTypeChips types={types} selectedIds={selectedTypeIds} onToggle={onToggleType} />
+      </Section>
+
+      <Section title={t('detailForm.causeTagsTitle')}>
+        <TagChips
+          tags={causeTags}
+          type="cause"
+          selectedIds={selectedTagIds}
+          onToggle={onToggleTag}
+          onCreate={onCreateTag}
+        />
+      </Section>
+
+      <Section title={t('detailForm.medicationTagsTitle')}>
+        <TagChips
+          tags={medicationTags}
+          type="medication"
+          selectedIds={selectedTagIds}
+          onToggle={onToggleTag}
+          onCreate={onCreateTag}
+        />
       </Section>
 
       <Section title={t('detailForm.occurredAtTitle')}>

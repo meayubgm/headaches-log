@@ -20,3 +20,29 @@ export class HeadacheNotFoundError extends Error {
     Object.setPrototypeOf(this, HeadacheNotFoundError.prototype);
   }
 }
+
+/** 対象のタグが無い（他端末で削除された、他ユーザーのIDを指した、など） */
+export class TagNotFoundError extends Error {
+  readonly tagId: string;
+
+  constructor(tagId: string) {
+    super(`Tag not found: ${tagId}`);
+    this.name = 'TagNotFoundError';
+    this.tagId = tagId;
+
+    Object.setPrototypeOf(this, TagNotFoundError.prototype);
+  }
+}
+
+/** 同じ区分にすでに同名のタグがある。ユーザーの入力ミスなので画面で文言に差し替える */
+export class DuplicateTagNameError extends Error {
+  readonly tagName: string;
+
+  constructor(tagName: string) {
+    super(`Duplicate tag name: ${tagName}`);
+    this.name = 'DuplicateTagNameError';
+    this.tagName = tagName;
+
+    Object.setPrototypeOf(this, DuplicateTagNameError.prototype);
+  }
+}

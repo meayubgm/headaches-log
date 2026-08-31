@@ -10,8 +10,15 @@ import { ToastBanner } from '@/components/toast-banner';
 import type { PainLevel } from '@/constants/pain-levels';
 import { useHeadache } from '@/hooks/use-headache';
 import { useHeadacheTypes } from '@/hooks/use-headache-types';
+import { useTagSelection } from '@/hooks/use-tag-selection';
+import { useTags } from '@/hooks/use-tags';
 import { softDeleteHeadache, updateHeadache } from '@/lib/db/repositories/headaches';
-import type { HeadacheRecord, HeadacheType, HeadacheTypeId } from '@/lib/db/repositories/types';
+import type {
+  HeadacheRecord,
+  HeadacheType,
+  HeadacheTypeId,
+  TagRecord,
+} from '@/lib/db/repositories/types';
 import { formatError } from '@/lib/format-error';
 import { t } from '@/lib/i18n';
 
@@ -31,16 +38,18 @@ function toFormState(record: HeadacheRecord): FormState {
   };
 }
 
-function isSameTypeIds(a: HeadacheTypeId[], b: HeadacheTypeId[]): boolean {
+/** 選択の集合としての比較。並び順の違いは変更とみなさない */
+function isSameIds<T>(a: T[], b: T[]): boolean {
   return a.length === b.length && a.every((id) => b.includes(id));
 }
 
-function isDirty(record: HeadacheRecord, form: FormState): boolean {
+function isDirty(record: HeadacheRecord, form: FormState, selectedTagIds: string[]): boolean {
   return (
     form.painLevel !== record.painLevel ||
     form.occurredAt.toISOString() !== record.occurredAt ||
     form.memo.trim() !== (record.memo ?? '') ||
-    !isSameTypeIds(form.typeIds, record.typeIds)
+    !isSameIds(form.typeIds, record.typeIds) ||
+    !isSameIds(selectedTagIds, record.tagIds)
   );
 }
 
@@ -57,8 +66,17 @@ function Message({ children }: { children: React.ReactNode }) {
  * 呼び出し側は `key={record.id}` を付けて記録が変わったらマウントし直す
  * （useEffect での再同期は cascading render になるため使わない）。
  */
-function HeadacheEditor({ record, types }: { record: HeadacheRecord; types: HeadacheType[] }) {
+function HeadacheEditor({
+  record,
+  types,
+  tags,
+}: {
+  record: HeadacheRecord;
+  types: HeadacheType[];
+  tags: TagRecord[];
+}) {
   const [form, setForm] = useState<FormState>(() => toFormState(record));
+  const { selectedTagIds, toggleTag, createAndSelectTag } = useTagSelection(record.tagIds);
   const [saving, setSaving] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [toast, setToast] = useState<{ id: number; message: string } | null>(null);
@@ -89,6 +107,7 @@ function HeadacheEditor({ record, types }: { record: HeadacheRecord; types: Head
         occurredAt: form.occurredAt.toISOString(),
         memo: form.memo.trim() === '' ? null : form.memo.trim(),
         typeIds: form.typeIds,
+        tagIds: selectedTagIds,
       });
 
       setToast((prev) => ({ id: (prev?.id ?? 0) + 1, message: t('editor.updated') }));
@@ -118,7 +137,7 @@ function HeadacheEditor({ record, types }: { record: HeadacheRecord; types: Head
     }
   };
 
-  const saveDisabled = !isDirty(record, form) || saving;
+  const saveDisabled = !isDirty(record, form, selectedTagIds) || saving;
 
   return (
     <View className="flex-1 bg-bg dark:bg-bg-dark">
@@ -144,6 +163,10 @@ function HeadacheEditor({ record, types }: { record: HeadacheRecord; types: Head
             onChangeOccurredAt={(occurredAt) => setForm((current) => ({ ...current, occurredAt }))}
             memo={form.memo}
             onChangeMemo={(memo) => setForm((current) => ({ ...current, memo }))}
+            tags={tags}
+            selectedTagIds={selectedTagIds}
+            onToggleTag={toggleTag}
+            onCreateTag={createAndSelectTag}
           />
 
           <Pressable
@@ -203,6 +226,7 @@ export default function HeadacheDetailScreen() {
 
   const recordState = useHeadache(id);
   const typesState = useHeadacheTypes();
+  const tagsState = useTags();
 
   if (recordState.status === 'loading') {
     return (
@@ -227,6 +251,7 @@ export default function HeadacheDetailScreen() {
       key={recordState.data.id}
       record={recordState.data}
       types={typesState.status === 'ready' ? typesState.data : []}
+      tags={tagsState.status === 'ready' ? tagsState.data : []}
     />
   );
 }

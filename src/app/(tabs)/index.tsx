@@ -10,6 +10,8 @@ import { ToastBanner } from '@/components/toast-banner';
 import type { PainLevel } from '@/constants/pain-levels';
 import { useHeadacheTypes } from '@/hooks/use-headache-types';
 import { useRecentHeadaches } from '@/hooks/use-recent-headaches';
+import { useTagSelection } from '@/hooks/use-tag-selection';
+import { useTags } from '@/hooks/use-tags';
 import { createHeadache } from '@/lib/db/repositories/headaches';
 import type { HeadacheTypeId } from '@/lib/db/repositories/types';
 import { formatFullDate, parseDateKey } from '@/lib/format-date';
@@ -21,7 +23,9 @@ export default function HomeScreen() {
   // 見出しの日付も、フォアグラウンドのまま日付をまたいだら張り替える
   const todayKey = useTodayKey();
   const typesState = useHeadacheTypes();
+  const tagsState = useTags();
   const recentState = useRecentHeadaches();
+  const { selectedTagIds, toggleTag, createAndSelectTag, clearTags } = useTagSelection();
 
   const [painLevel, setPainLevel] = useState<PainLevel | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -34,6 +38,7 @@ export default function HomeScreen() {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const types = typesState.status === 'ready' ? typesState.data : [];
+  const tags = tagsState.status === 'ready' ? tagsState.data : [];
   const records = recentState.status === 'ready' ? recentState.data : [];
 
   const toggleDetail = () => {
@@ -66,10 +71,12 @@ export default function HomeScreen() {
         occurredAt: (occurredAt ?? new Date()).toISOString(),
         memo: memo.trim() === '' ? null : memo.trim(),
         typeIds: selectedTypeIds,
+        tagIds: selectedTagIds,
       });
 
       setPainLevel(null);
       setSelectedTypeIds([]);
+      clearTags();
       setOccurredAt(null);
       setMemo('');
       setDetailOpen(false);
@@ -112,6 +119,10 @@ export default function HomeScreen() {
               onChangeOccurredAt={setOccurredAt}
               memo={memo}
               onChangeMemo={setMemo}
+              tags={tags}
+              selectedTagIds={selectedTagIds}
+              onToggleTag={toggleTag}
+              onCreateTag={createAndSelectTag}
             />
           )}
 

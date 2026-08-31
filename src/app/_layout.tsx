@@ -26,6 +26,10 @@ export default function RootLayout() {
             name="headaches/[id]"
             options={{ title: t('navigation.headacheDetail'), headerBackTitle: t('navigation.back') }}
           />
+          <Stack.Screen
+            name="settings/tags"
+            options={{ title: t('navigation.tagSettings'), headerBackTitle: t('navigation.back') }}
+          />
         </Stack>
       </SplashGate>
     </ThemeProvider>

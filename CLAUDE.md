@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 対応言語は日本語と英語。端末の言語に追従し、それ以外の言語では英語で表示する（アプリ内の言語切り替えUIは持たない）。
 
-現在の実装状況: Phase 2（カレンダー表示）まで完了。ホーム画面から痛み度合い・頭痛の種類（片頭痛／緊張型／その他）・メモ・発生時刻を記録し、ローカルSQLiteに保存して一覧表示できる。カレンダー画面では月グリッドに痛み度合いの色ドットと件数を表示し、日付を選ぶとその日の記録一覧が出て、項目から詳細画面（編集・論理削除）へ遷移できる。選択日が今日以前なら「この日に記録を追加」から新規作成画面へ進み、その日を発生時刻の初期値（今日は現在時刻、過去日は12:00）として記録できる。タグ管理・Supabase同期・認証は未実装。
+現在の実装状況: Phase 3（タグ管理）まで完了。ホーム画面から痛み度合い・頭痛の種類（片頭痛／緊張型／その他）・原因タグ・服薬タグ・メモ・発生時刻を記録し、ローカルSQLiteに保存して一覧表示できる。カレンダー画面では月グリッドに痛み度合いの色ドットと件数を表示し、日付を選ぶとその日の記録一覧が出て、項目から詳細画面（編集・論理削除）へ遷移できる。選択日が今日以前なら「この日に記録を追加」から新規作成画面へ進み、その日を発生時刻の初期値（今日は現在時刻、過去日は12:00）として記録できる。タグは設定タブ→タグ管理画面で追加・リネーム（過去記録にも追従）・削除（使用中は件数入りの確認ダイアログ）ができ、記録画面のチップ末尾「＋ 追加」からその場で作成もできる。Supabase同期・認証は未実装。
 
 ## 技術スタック
 
@@ -89,24 +89,35 @@ Xcode を更新した直後は iOS プラットフォーム（SDK 実体とシ�
 
 ### ディレクトリ構成
 
-- `src/app/` — Expo Routerの画面（file-basedルーティング）。`tsconfig.json` で `@/*` → `src/*` にエイリアスされている。ルートの `<Stack>` が `(tabs)`（ホーム／カレンダーの2タブ）と `headaches/new`（カレンダーから日付を指定して追加する新規作成画面）・`headaches/[id]`（詳細画面）を持つ。後者2つはタブの外に置きヘッダー付きでpushする（静的セグメントの `new` が動的セグメントの `[id]` より優先される）。`app.json` の `experiments.typedRoutes` が有効なので、`router.push()` には `{ pathname: '/headaches/[id]', params: { id } }` の形で渡す（テンプレートリテラルは型が通らない）
+- `src/app/` — Expo Routerの画面（file-basedルーティング）。`tsconfig.json` で `@/*` → `src/*` にエイリアスされている。ルートの `<Stack>` が `(tabs)`（ホーム／カレンダー／設定の3タブ）と `headaches/new`（カレンダーから日付を指定して追加する新規作成画面）・`headaches/[id]`（詳細画面）・`settings/tags`（タグ管理画面）を持つ。後ろ3つはタブの外に置きヘッダー付きでpushする（静的セグメントの `new` が動的セグメントの `[id]` より優先される）。`app.json` の `experiments.typedRoutes` が有効なので、`router.push()` には `{ pathname: '/headaches/[id]', params: { id } }` の形で渡す（テンプレートリテラルは型が通らない）
 - `src/components/` — UIコンポーネント。`splash-gate.tsx` が `bootstrapDb()` の完了を待ってスプラッシュを閉じる（`SplashScreen.hideAsync()` を呼ぶのはここだけ）
   - 発生時刻の入力は `date-time-field.tsx` →`date-time-wheel.tsx`（月/日/時/分の4列）→`wheel-picker-column.tsx`（ScrollViewベースの1列）の3段構成。**OSのDateTimePickerは使わず iOS/Android/Web で同一実装**にしている（プラットフォームごとに見た目と操作が割れるのを避けるため）。月列は年をまたいで連続し（選択中の年は `formatFullDateTime` の表示テキストで示す）、列の中央をタップするとテンキー入力へ切り替わる。上限（未来）を超える項目は `disabled` にし、確定値は `lib/clamp-date.ts` で丸める
 - `src/lib/i18n/` — 多言語化。`index.ts` が端末言語を解決して `t()` を公開し、`locales/ja.ts` と `locales/en.ts` が辞書。`ja.ts` の `Translations` 型を `en.ts` に課しているので、キーの取りこぼしは型エラーになる。**表示言語は起動時に一度だけ決まる**（切り替えUIを持たないため、実行中に変わらない前提で `t()` を素の関数として使える）。未対応の言語と辞書の欠落は英語へフォールバックする
-- `src/constants/pain-levels.ts` / `src/constants/headache-types.ts` — 痛み度合いと頭痛の種類の**表示名を解決する層**。DB は言語非依存の値（`pain_level` の 1〜4、`headache_types.code` の `migraine` / `tension` / `other`）だけを持ち、和訳・英訳はここから `t()` を引く
+- `src/constants/pain-levels.ts` / `src/constants/headache-types.ts` / `src/constants/tag-types.ts` — 痛み度合い・頭痛の種類・タグ区分の**表示名を解決する層**。DB は言語非依存の値（`pain_level` の 1〜4、`headache_types.code` の `migraine` / `tension` / `other`、`tags.type` の `cause` / `medication`）だけを持ち、和訳・英訳はここから `t()` を引く。**ただし `tags.name` はユーザーが入力した文字列そのもの**で、この層を通さずそのまま表示する
 - `src/constants/design-tokens.json` — 色・スペーシングトークンの**唯一の出所**。`src/constants/theme.ts`（JS側）と `tailwind.config.js`（NativeWind）の両方がこれを読む。tailwind.config.js は素のNodeが読むためTSの theme.ts を require できないので JSON にしている
 - `src/lib/db/` — ローカルSQLite関連
   - `schema.ts` — drizzle-ormによるテーブル定義（`headaches`, `headache_types`, `headache_headache_types`, `tags`, `headache_tags`, `sync_meta`）。`headache_types` が持つのは表示名ではなく言語非依存の `code`（`migraine` / `tension` / `other`）で、和訳・英訳は `src/constants/headache-types.ts` が解決する
   - `client.ts` — `openDatabaseAsync` でDBハンドルを初期化（`initDb()` / `getDb()`）。iOS/Android/Webで非同期APIのみを使う
   - `migrate.ts` — `migrations/` を適用する自前ランナー（`runMigrations`）。適用済みは独自の `__migrations` テーブルで管理
   - `repositories/` — 画面から使うDBアクセス層。生SQLをここに閉じ込め、drizzleのスキーマ型を画面に漏らさない。全関数が `Promise` を返す
-  - `repositories/errors.ts` — リポジトリ層が投げるドメインエラー（`HeadacheNotFoundError`）。`Error` のサブクラスはトランスパイル環境でプロトタイプ鎖が切れることがあるため、コンストラクタで `Object.setPrototypeOf` を呼んでいる
-  - `bootstrap.ts` — 起動処理（DB初期化→マイグレーション→ローカルuser_id初期化）を Promise ごとキャッシュして**アプリ全体で1回だけ**実行する（`bootstrapDb()`）。Fast Refresh / StrictMode で並行実行されるとマイグレーションが二重に走り `table already exists` で失敗するため
+  - `repositories/errors.ts` — リポジトリ層が投げるドメインエラー（`HeadacheNotFoundError` / `TagNotFoundError` / `DuplicateTagNameError`）。`Error` のサブクラスはトランスパイル環境でプロトタイプ鎖が切れることがあるため、コンストラクタで `Object.setPrototypeOf` を呼んでいる
+  - `bootstrap.ts` — 起動処理（DB初期化→マイグレーション→ローカルuser_id初期化→プリセットタグの投入）を Promise ごとキャッシュして**アプリ全体で1回だけ**実行する（`bootstrapDb()`）。Fast Refresh / StrictMode で並行実行されるとマイグレーションが二重に走り `table already exists` で失敗するため。`seedDefaultTags()` は `tags.user_id` にローカル user_id が要るので必ず `initLocalUserId()` の後に置く
   - `db-revision.ts` — 書き込み通知用のリビジョンカウンタ（`useSyncExternalStore`）。書き込み系リポジトリ関数の末尾で `bumpDbRevision()` を呼び、`useRecentHeadaches` などが再読み込みする
 - `src/lib/format-error.ts` — エラーの画面向け文字列化。**エラー文言の方針**は次の2種類に分ける。ユーザーが通常の操作で踏みうるもの（記録が見つからない等）は `repositories/errors.ts` の型付きエラーにし、`formatError` が型で判別して `t()` から日本語／英語の文言を引く（リポジトリ層に表示言語を持ち込まないため）。バグでしか起きない不変条件違反（不正な値、初期化順の誤り、マイグレーションSQLの欠落）は**英語の診断メッセージ**をそのまま投げる（開発者向けであり、ログや issue で扱いやすいため）
 - `src/lib/format-date.ts` — 日付表示。語順が言語ごとに違うため辞書の差し込みではなく `ja` / `en` の分岐をこのファイルに閉じ込める（例: `2026年8月24日（月）` / `Mon, Aug 24, 2026`）。時刻は日時ホイールの列（00〜23）と揃えるため英語でも24時間表記
 - `src/lib/calendar.ts` — 月グリッド生成（`buildMonthGrid` / `getGridRange`）と日別集計（`summarizeByDay`）の純粋関数。`occurred_at` はISO8601（UTC）で保存しているため、**日別のグルーピングはSQLiteではなくJS側でローカル日付として行う**（Webのwa-sqliteでは `date(..., 'localtime')` が端末タイムゾーン通りに解決される保証がないため）
 - `supabase/` — Supabase CLIのローカル環境設定と、Postgres側スキーマ・RLSポリシーのマイグレーション（`supabase/migrations/`）
+
+### タグの設計方針
+
+`tags` は `type`（`cause` / `medication`）で原因タグ・服薬タグを1テーブルにまとめ、表示名 `name` は**ユーザーが入力した文字列そのもの**を持つ（`headache_types` と違い言語非依存コードは持たない）。そのため:
+
+- **リネームは `tags.name` の UPDATE 1本**で済む。中間テーブル `headache_tags` は id 参照なので過去記録の表示が自動で追従する（要件 2-2「編集時は過去記録のタグ名も一括で追従」）
+- **削除は `headache_tags` の関連行を物理削除したうえで `tags.deleted_at` を立てる**（要件の「全記録から関連付けを外してからタグを削除」＋同期用トンビストーン）。削除前に `countHeadachesUsingTag()` で使用件数を数え、1件以上なら件数入りの確認ダイアログを出す
+- **記録を書き込むときは `filterAvailableTagIds()` で生存タグに絞る**（`headaches.ts`）。画面が持つ選択は別タブでそのタグが削除されても残るため、素通しすると削除済みタグへの関連行ができ、読み出し側の JOIN で弾かれて画面に出ない「見えない関連付け」になる
+- **プリセットの投入と `sync_meta.default_tags_seeded` の書き込みは同一トランザクション**にする。別々にコミットすると、その隙間で落ちた場合に次回起動で二重に投入される
+- **同名の禁止は UNIQUE 索引ではなくリポジトリ層のチェック**（`DuplicateTagNameError`）で行う。論理削除済みの行と衝突させないため
+- **プリセットは初回起動時に原因タグだけを投入**する（`seedDefaultTags()`）。`sync_meta.default_tags_seeded` で一度だけ実行し、ユーザーが全部消しても復活しない。投入内容は起動時のロケールで決まるため、Phase 4 の同期では別言語の端末へそのまま流れる（`name` が言語非依存でないことによる割り切り）。服薬タグは薬名が個人・地域ごとに違うため空で始める
 
 ### オフラインファースト＋同期の設計方針
 

@@ -5,11 +5,13 @@ export const ja = {
   tabs: {
     home: 'ホーム',
     calendar: 'カレンダー',
+    settings: '設定',
   },
   navigation: {
     back: '戻る',
     newHeadache: '記録を追加',
     headacheDetail: '記録の詳細',
+    tagSettings: 'タグ管理',
   },
   painLevels: {
     mild: '軽い',
@@ -21,6 +23,10 @@ export const ja = {
     migraine: '片頭痛',
     tension: '緊張型',
     other: 'その他',
+  },
+  tagTypes: {
+    cause: '原因',
+    medication: '服薬',
   },
   home: {
     painQuestion: 'いまの痛みは？',
@@ -51,6 +57,11 @@ export const ja = {
     shortcutHoursAgo: '%{hours}時間前',
     shortcutNowA11y: '発生時刻をいまにする',
     shortcutShiftA11y: '発生時刻を%{label}にずらす',
+    causeTagsTitle: '原因タグ（複数選択可）',
+    medicationTagsTitle: '服薬タグ（複数選択可）',
+    tagChipA11y: 'タグ %{name}',
+    addTag: '＋ 追加',
+    addTagA11y: '%{type}タグを追加',
   },
   dateTimeField: {
     change: '変更',
@@ -94,6 +105,32 @@ export const ja = {
   painLevelSelector: {
     a11y: '痛みの度合い %{level}: %{label}',
   },
+  settings: {
+    title: '設定',
+    tags: 'タグ管理',
+    tagsDescription: '原因タグ・服薬タグの追加、名前の変更、削除',
+  },
+  tags: {
+    causeTitle: '原因タグ',
+    medicationTitle: '服薬タグ',
+    emptyCause: '原因タグはまだありません。',
+    emptyMedication: '服薬タグはまだありません。',
+    add: '＋ タグを追加',
+    addA11y: '%{type}タグを追加',
+    addTitle: 'タグを追加',
+    renameTitle: 'タグの名前を変更',
+    namePlaceholder: 'タグの名前',
+    save: '保存',
+    saved: '保存しました',
+    renameA11y: 'タグ %{name} の名前を変更',
+    deleteA11y: 'タグ %{name} を削除',
+    deleteConfirmTitle: 'タグを削除しますか？',
+    deleteConfirmMessage: 'この操作は取り消せません。',
+    deleteInUseMessage:
+      'このタグは%{count}件の記録で使われています。削除するとその記録からも外れます。この操作は取り消せません。',
+    deleteConfirmLabel: '削除する',
+    deleted: '削除しました',
+  },
   confirmDialog: {
     cancel: 'キャンセル',
   },
@@ -101,6 +138,8 @@ export const ja = {
     saveFailed: '保存に失敗しました: %{message}',
     headacheNotFound: 'この記録は見つかりませんでした。他の端末で削除された可能性があります。',
     loadFailed: '記録の読み込みに失敗しました: %{message}',
+    tagNotFound: 'このタグは見つかりませんでした。他の端末で削除された可能性があります。',
+    duplicateTagName: '「%{name}」は既にあります。別の名前を入力してください。',
     dbInitFailed: 'データベースの初期化に失敗しました',
   },
 };

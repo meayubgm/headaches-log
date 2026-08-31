@@ -1,5 +1,6 @@
 import type { HeadacheTypeCode } from '@/constants/headache-types';
 import type { PainLevel } from '@/constants/pain-levels';
+import type { TagType } from '@/constants/tag-types';
 
 /**
  * headache_types のマスタ id。Supabase 側の serial 採番と一致させている。
@@ -14,6 +15,23 @@ export type HeadacheType = {
 };
 
 /**
+ * 画面が扱うタグ。name はユーザーが入力した文字列そのもの（言語非依存コードは持たない）。
+ * リネームすると tags.name の更新だけで過去記録の表示も追従する（中間テーブルが id 参照のため）。
+ */
+export type TagRecord = {
+  id: string;
+  name: string;
+  type: TagType;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateTagInput = {
+  name: string;
+  type: TagType;
+};
+
+/**
  * 画面が扱う頭痛記録。drizzle のスキーマ型を画面へ漏らさないための境界。
  * 日時はすべて ISO8601（UTC）文字列。
  */
@@ -23,6 +41,7 @@ export type HeadacheRecord = {
   painLevel: PainLevel;
   memo: string | null;
   typeIds: HeadacheTypeId[];
+  tagIds: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -33,6 +52,7 @@ export type CreateHeadacheInput = {
   occurredAt?: string;
   memo?: string | null;
   typeIds?: HeadacheTypeId[];
+  tagIds?: string[];
 };
 
 export type UpdateHeadacheInput = Partial<CreateHeadacheInput>;

@@ -7,11 +7,13 @@ export const en: Translations = {
   tabs: {
     home: 'Home',
     calendar: 'Calendar',
+    settings: 'Settings',
   },
   navigation: {
     back: 'Back',
     newHeadache: 'Add record',
     headacheDetail: 'Record details',
+    tagSettings: 'Tags',
   },
   painLevels: {
     mild: 'Mild',
@@ -23,6 +25,10 @@ export const en: Translations = {
     migraine: 'Migraine',
     tension: 'Tension',
     other: 'Other',
+  },
+  tagTypes: {
+    cause: 'Trigger',
+    medication: 'Medication',
   },
   home: {
     painQuestion: 'How bad is it right now?',
@@ -53,6 +59,11 @@ export const en: Translations = {
     shortcutHoursAgo: '%{hours} hr earlier',
     shortcutNowA11y: 'Set the time of onset to now',
     shortcutShiftA11y: 'Shift the time of onset %{label}',
+    causeTagsTitle: 'Trigger tags (choose any)',
+    medicationTagsTitle: 'Medication tags (choose any)',
+    tagChipA11y: 'Tag %{name}',
+    addTag: '+ Add',
+    addTagA11y: 'Add a %{type} tag',
   },
   dateTimeField: {
     change: 'Change',
@@ -94,6 +105,32 @@ export const en: Translations = {
   painLevelSelector: {
     a11y: 'Pain level %{level}: %{label}',
   },
+  settings: {
+    title: 'Settings',
+    tags: 'Tags',
+    tagsDescription: 'Add, rename and delete trigger and medication tags',
+  },
+  tags: {
+    causeTitle: 'Trigger tags',
+    medicationTitle: 'Medication tags',
+    emptyCause: 'No trigger tags yet.',
+    emptyMedication: 'No medication tags yet.',
+    add: '+ Add a tag',
+    addA11y: 'Add a %{type} tag',
+    addTitle: 'Add a tag',
+    renameTitle: 'Rename tag',
+    namePlaceholder: 'Tag name',
+    save: 'Save',
+    saved: 'Saved',
+    renameA11y: 'Rename the tag %{name}',
+    deleteA11y: 'Delete the tag %{name}',
+    deleteConfirmTitle: 'Delete this tag?',
+    deleteConfirmMessage: 'This cannot be undone.',
+    deleteInUseMessage:
+      'This tag is used by %{count} record(s). Deleting it also removes it from those records. This cannot be undone.',
+    deleteConfirmLabel: 'Delete',
+    deleted: 'Deleted',
+  },
   confirmDialog: {
     cancel: 'Cancel',
   },
@@ -101,6 +138,8 @@ export const en: Translations = {
     saveFailed: 'Could not save: %{message}',
     headacheNotFound: 'This record was not found. It may have been deleted on another device.',
     loadFailed: 'Could not load records: %{message}',
+    tagNotFound: 'This tag was not found. It may have been deleted on another device.',
+    duplicateTagName: '"%{name}" already exists. Please use a different name.',
     dbInitFailed: 'Could not initialize the database',
   },
 };

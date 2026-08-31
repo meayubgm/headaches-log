@@ -1,4 +1,8 @@
-import { HeadacheNotFoundError } from './db/repositories/errors';
+import {
+  DuplicateTagNameError,
+  HeadacheNotFoundError,
+  TagNotFoundError,
+} from './db/repositories/errors';
 import { t } from './i18n';
 
 /**
@@ -11,6 +15,14 @@ import { t } from './i18n';
 export function formatError(error: unknown): string {
   if (error instanceof HeadacheNotFoundError) {
     return t('errors.headacheNotFound');
+  }
+
+  if (error instanceof TagNotFoundError) {
+    return t('errors.tagNotFound');
+  }
+
+  if (error instanceof DuplicateTagNameError) {
+    return t('errors.duplicateTagName', { name: error.tagName });
   }
 
   return error instanceof Error ? error.message : String(error);

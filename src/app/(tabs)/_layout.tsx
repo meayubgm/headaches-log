@@ -40,6 +40,15 @@ export default function TabsLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: t('tabs.settings'),
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome6 name="gear" solid size={size} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
